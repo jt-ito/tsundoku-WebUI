@@ -114,6 +114,13 @@ export class AuthManager {
         );
     }
 
+    /** The id of the signed-in account, null if there is no login (a server without a required login). */
+    static getActiveUserId(): number | null {
+        const token = AuthManager.getRefreshToken();
+        const userId = token ? decodeTokenPayload(token)?.user_id : null;
+        return typeof userId === 'number' ? userId : null;
+    }
+
     static getSavedAccounts(): SavedAccount[] {
         return AppStorage.local.getItemParsed<SavedAccount[]>(AuthManager.SAVED_ACCOUNTS_KEY, []);
     }

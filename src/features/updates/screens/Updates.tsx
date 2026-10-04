@@ -11,6 +11,7 @@ import Stack from '@mui/material/Stack';
 import UpdateIcon from '@mui/icons-material/Update';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useLingui } from '@lingui/react/macro';
+import { AuthManager } from '@/features/authentication/AuthManager.ts';
 import { useQueryParam, NumberParam } from 'use-query-params';
 import type { GroupedVirtuosoHandle } from 'react-virtuoso';
 import { requestManager } from '@/lib/requests/RequestManager.ts';
@@ -37,13 +38,17 @@ import { OffsetComponentWithContainer } from '@/base/OffsetComponent.tsx';
 import { useElementSize } from '@mantine/hooks';
 import type { ChapterUpdateListFieldsFragment } from '@/lib/graphql/generated/graphql.ts';
 
-const UPDATES_CACHE_KEY = 'updates.cachedEntries';
+// per account: another account's updates must never be painted while this one's are loading
+const getUpdatesCacheKey = () => `updates.cachedEntries.${AuthManager.getActiveUserId() ?? 'default'}`;
+// when a whole page collapses into manga that are already listed (one manga with many new chapters), the next pages
+// are fetched in bigger steps so the next manga shows up sooner
+const UPDATES_SKIP_PAGE_SIZE = 450;
 // one page's worth - just enough to paint the screen instantly, the live query replaces it right after
 const UPDATES_CACHE_LIMIT = 150;
 
 const readCachedUpdates = (): ChapterUpdateListFieldsFragment[] => {
     try {
-        return JSON.parse(localStorage.getItem(UPDATES_CACHE_KEY) ?? '[]');
+        return JSON.parse(localStorage.getItem(getUpdatesCacheKey()) ?? '[]');
     } catch {
         return [];
     }
@@ -51,7 +56,7 @@ const readCachedUpdates = (): ChapterUpdateListFieldsFragment[] => {
 
 const writeCachedUpdates = (entries: readonly ChapterUpdateListFieldsFragment[]) => {
     try {
-        localStorage.setItem(UPDATES_CACHE_KEY, JSON.stringify(entries.slice(0, UPDATES_CACHE_LIMIT)));
+        localStorage.setItem(getUpdatesCacheKey(), JSON.stringify(entries.slice(0, UPDATES_CACHE_LIMIT)));
     } catch {
         // storage full/unavailable (e.g. private browsing) - the cache is a nice-to-have, not required
     }
@@ -93,6 +98,8 @@ export const Updates: React.FC = () => {
     }, [chapterUpdateData]);
 
     const [prevUpdateEntriesCount, setPrevUpdateEntriesCount] = useState(0);
+    // fetching more does not count as loading, without this the list looks stuck while the next pages come in
+    const [isFetchingMore, setIsFetchingMore] = useState(false);
 
     const [firstUnreadUpdatesByGroup, otherUpdatesByMangaByGroup] = useMemo(() => {
         const groupedEntries = Chapters.groupByDate(allUpdateEntries, 'fetchedAt');
@@ -185,21 +192,25 @@ export const Updates: React.FC = () => {
     const lastUpdateTimestamp = lastUpdateTimestampData?.lastUpdateTimestamp.timestamp;
     const date = lastUpdateTimestamp ? dateTimeFormatter.format(+lastUpdateTimestamp) : '-';
 
-    const loadMore = useCallback(() => {
-        if (!hasNextPage) {
-            return;
-        }
+    const loadMore = useCallback(
+        (pageSize?: number) => {
+            if (!hasNextPage || isFetchingMore) {
+                return;
+            }
 
-        fetchMore({ variables: { offset: allUpdateEntries.length } }).then(() =>
-            setPrevUpdateEntriesCount(firstUnreadUpdatesEntries.length),
-        );
-    }, [hasNextPage, allUpdateEntries.length, firstUnreadUpdatesEntries.length]);
+            setIsFetchingMore(true);
+            fetchMore({ variables: { offset: allUpdateEntries.length, ...(pageSize ? { first: pageSize } : {}) } })
+                .then(() => setPrevUpdateEntriesCount(firstUnreadUpdatesEntries.length))
+                .finally(() => setIsFetchingMore(false));
+        },
+        [hasNextPage, isFetchingMore, allUpdateEntries.length, firstUnreadUpdatesEntries.length],
+    );
 
     const filteredOutAllItemsOfFetchedPage =
         allUpdateEntries.length > 0 && prevUpdateEntriesCount === firstUnreadUpdatesEntries.length;
     useEffect(() => {
         if (filteredOutAllItemsOfFetchedPage && hasNextPage && !isLoading) {
-            loadMore();
+            loadMore(UPDATES_SKIP_PAGE_SIZE);
         }
     }, [isLoading, hasNextPage, filteredOutAllItemsOfFetchedPage, loadMore]);
 
@@ -255,9 +266,9 @@ export const Updates: React.FC = () => {
                 persistKey="updates"
                 heightToSubtract={lastUpdateTimestampCompHeight}
                 components={{
-                    Footer: () => (isLoading ? <LoadingPlaceholder usePadding /> : null),
+                    Footer: () => (isLoading || isFetchingMore ? <LoadingPlaceholder usePadding /> : null),
                 }}
-                endReached={loadMore}
+                endReached={() => loadMore()}
                 groupCounts={firstUnreadUpdatesGroupCounts}
                 groupContent={(index) => (
                     <StyledGroupHeader isFirstItem={index === 0}>

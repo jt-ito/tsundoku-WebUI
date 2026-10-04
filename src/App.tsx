@@ -36,6 +36,8 @@ import { AuthManager } from '@/features/authentication/AuthManager.ts';
 import { ImageProcessingType } from '@/features/settings/Settings.types.ts';
 import { MigrationFABIndicator } from '@/features/migration/components/MigrationFABIndicator.tsx';
 import { MigrationManager } from '@/features/migration/MigrationManager.ts';
+import { useReloadOnNewVersion } from '@/lib/utils/ReloadOnNewVersion.ts';
+import { usePinchZoomOnlyInReader } from '@/lib/utils/PinchZoom.ts';
 import { SplashScreen } from '@/features/authentication/components/SplashScreen.tsx';
 import { d } from 'koration';
 import { OffsetContainer } from '@/base/OffsetComponent.tsx';
@@ -213,6 +215,18 @@ const ReactRouterSetter = () => {
     useEffect(() => {
         ReactRouter.setNavigateFn(navigate);
     }, []);
+
+    return null;
+};
+
+const PinchZoomGuard = () => {
+    usePinchZoomOnlyInReader();
+
+    return null;
+};
+
+const ReloadOnNewVersion = () => {
+    useReloadOnNewVersion();
 
     return null;
 };
@@ -415,6 +429,7 @@ const OffsetContainerRoot = ({ children }: { children?: ReactNode }) => {
 export const App: React.FC = () => (
     <AppContext>
         <ScrollToTop />
+        <PinchZoomGuard />
         <AwaitableComponent.Root />
 
         <ReactRouterSetter />
@@ -427,6 +442,7 @@ export const App: React.FC = () => (
                 <WebUIUpdateChecker />
                 <InitialBackgroundRequests />
                 <BackgroundSubscriptions />
+                <ReloadOnNewVersion />
                 <ResumeMigration />
 
                 <Box sx={{ display: 'flex' }}>

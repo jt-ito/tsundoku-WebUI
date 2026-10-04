@@ -318,9 +318,28 @@ export const FORK_COMPONENT_OVERRIDES: Components<Theme> = {
                         paintOrder: 'stroke fill',
                         textShadow: TEXT_SHADOW,
                     },
+                    // an app added to the home screen: plain title, whatever the engine does with outlines and shadows there
+                    '@media (display-mode: standalone)': {
+                        WebkitTextStroke: 'none',
+                        textShadow: 'none',
+                    },
                 },
                 backdropFilter: 'blur(10px) saturate(150%)',
                 WebkitBackdropFilter: 'blur(10px) saturate(150%)',
+                // iOS 26 lays a system blur over the top ~40pt of an app on the home screen, which blurs the title and icons
+                // (nothing in CSS or the meta tags turns it off). It is skipped only when a fixed box at the top edge has an
+                // opaque background-color and no backdrop-filter: WebKit then takes that color for the edge instead. So in
+                // that case the bar gives up its glass.
+                '@media (display-mode: standalone)': {
+                    '@supports (-webkit-touch-callout: none)': {
+                        backgroundColor: 'var(--AppBar-background)',
+                        ...theme.applyStyles('dark', {
+                            backgroundColor: theme.vars?.palette.background.paper ?? theme.palette.background.paper,
+                        }),
+                        backdropFilter: 'none',
+                        WebkitBackdropFilter: 'none',
+                    },
+                },
                 // the bar is flush with the top and sides of the window, so only the bottom corners are rounded, slightly
                 borderRadius: '0 0 8px 8px',
                 borderBottom: `1px solid ${theme.palette.divider}`,
