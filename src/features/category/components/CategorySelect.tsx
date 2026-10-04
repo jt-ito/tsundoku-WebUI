@@ -21,7 +21,7 @@ import { requestManager } from '@/lib/requests/RequestManager.ts';
 import { Mangas } from '@/features/manga/services/Mangas.ts';
 import { useSelectableCollection } from '@/base/collection/hooks/useSelectableCollection.ts';
 import { ThreeStateCheckboxInput } from '@/base/components/inputs/ThreeStateCheckboxInput.tsx';
-import { Categories } from '@/features/category/services/Categories.ts';
+import { Categories, DEFAULT_CATEGORY_ID } from '@/features/category/services/Categories.ts';
 import { CheckboxInput } from '@/base/components/inputs/CheckboxInput.tsx';
 import { makeToast } from '@/base/utils/Toast.ts';
 import { defaultPromiseErrorHandler } from '@/lib/DefaultPromiseErrorHandler.ts';
@@ -108,14 +108,23 @@ export function CategorySelect(props: CategorySelectProps) {
 
     const [doNotShowAddToLibraryDialogAgain, setDoNotShowAddToLibraryDialogAgain] = useState(false);
 
-    const mangaCategoryIds = useGetMangaCategoryIds(mangaId);
+    const allMangaCategoryIds = useGetMangaCategoryIds(mangaId);
 
     const { data } = requestManager.useGetCategories<GetCategoriesBaseQuery, GetCategoriesBaseQueryVariables>(
         GET_CATEGORIES_BASE,
     );
     const categoriesData = data?.categories.nodes ?? STABLE_EMPTY_ARRAY;
 
+    // a manga can be linked into the categories of other accounts (shared libraries): only the ones listed here are this account's
+    const mangaCategoryIds = useMemo(
+        () => allMangaCategoryIds.filter((id) => categoriesData.some((category) => category.id === id)),
+        [allMangaCategoryIds, categoriesData],
+    );
+
     const allCategories = useMemo(() => Categories.getUserCreated(categoriesData), [categoriesData]);
+
+    // the default category is "in none of the categories": it is listed when the account has it, and picking it clears the others
+    const userCreatedIds = useMemo(() => Categories.getIds(allCategories), [allCategories]);
 
     const defaultCategoryIds = useMemo(
         () => (addToLibrary ? Categories.getIds(Categories.getDefaults(allCategories)) : []),
@@ -143,6 +152,17 @@ export function CategorySelect(props: CategorySelectProps) {
 
     const categoriesToAdd = getSelectionForKey('categoriesToAdd');
     const categoriesToRemove = getSelectionForKey('categoriesToRemove');
+
+    const isDefaultChecked = isSingleSelectionMode
+        ? categoriesToAdd.length === 0
+        : categoriesToAdd.length === 0 &&
+          userCreatedIds.length > 0 &&
+          userCreatedIds.every((categoryId) => categoriesToRemove.includes(categoryId));
+
+    const selectDefaultCategory = () => {
+        setSelectionForKey('categoriesToAdd', []);
+        setSelectionForKey('categoriesToRemove', isSingleSelectionMode ? [] : userCreatedIds);
+    };
 
     const handleCancel = () => {
         setSelectionForKey('categoriesToAdd', mangaCategoryIds);
@@ -203,31 +223,44 @@ export function CategorySelect(props: CategorySelectProps) {
             <DialogTitle>{t`Set categories`}</DialogTitle>
             <DialogContent dividers>
                 <FormGroup>
-                    {allCategories.length === 0 && <span>{t`You don't have any categories yet.`}</span>}
-                    {allCategories.map((category) => (
-                        <ThreeStateCheckboxInput
-                            checked={getCategoryCheckedState(
-                                category.id,
-                                categoriesToAdd,
-                                categoriesToRemove,
-                                isSingleSelectionMode,
-                            )}
-                            onChange={(checked) => {
-                                handleSelection(category.id, false, { key: 'categoriesToAdd' });
-                                handleSelection(category.id, false, { key: 'categoriesToRemove' });
+                    {categoriesData.length === 0 && <span>{t`You don't have any categories yet.`}</span>}
+                    {categoriesData.map((category) =>
+                        category.id === DEFAULT_CATEGORY_ID ? (
+                            <CheckboxInput
+                                key={category.id}
+                                label={category.name}
+                                checked={isDefaultChecked}
+                                onChange={(e) => {
+                                    if (e.target.checked) {
+                                        selectDefaultCategory();
+                                    }
+                                }}
+                            />
+                        ) : (
+                            <ThreeStateCheckboxInput
+                                checked={getCategoryCheckedState(
+                                    category.id,
+                                    categoriesToAdd,
+                                    categoriesToRemove,
+                                    isSingleSelectionMode,
+                                )}
+                                onChange={(checked) => {
+                                    handleSelection(category.id, false, { key: 'categoriesToAdd' });
+                                    handleSelection(category.id, false, { key: 'categoriesToRemove' });
 
-                                if (checked) {
-                                    handleSelection(category.id, true, { key: 'categoriesToAdd' });
-                                }
+                                    if (checked) {
+                                        handleSelection(category.id, true, { key: 'categoriesToAdd' });
+                                    }
 
-                                if (checked === false) {
-                                    handleSelection(category.id, true, { key: 'categoriesToRemove' });
-                                }
-                            }}
-                            label={category.name}
-                            key={category.id}
-                        />
-                    ))}
+                                    if (checked === false) {
+                                        handleSelection(category.id, true, { key: 'categoriesToRemove' });
+                                    }
+                                }}
+                                label={category.name}
+                                key={category.id}
+                            />
+                        ),
+                    )}
                 </FormGroup>
             </DialogContent>
             <DialogActions>

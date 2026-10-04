@@ -25,5 +25,9 @@ export const LIBRARY_SHARE_FIELDS = gql`
         lastSyncedAt
         pairedWith
         twoWayStatus
+        mirror
+        proposedSynced
+        proposedMirror
+        proposalIsMine
     }
 `;

@@ -113,6 +113,11 @@ export type BooleanFilterInput = {
     notIn?: InputMaybe<Array<Scalars['Boolean']['input']>>;
 };
 
+export type CancelLibraryShareEditInput = {
+    clientMutationId?: InputMaybe<Scalars['String']['input']>;
+    id: Scalars['Int']['input'];
+};
+
 export type CancelLibraryShareInput = {
     clientMutationId?: InputMaybe<Scalars['String']['input']>;
     id: Scalars['Int']['input'];
@@ -434,6 +439,7 @@ export type CreateCategoryPayload = {
 export type CreateLibraryShareInput = {
     categoryIds: Array<Scalars['Int']['input']>;
     clientMutationId?: InputMaybe<Scalars['String']['input']>;
+    mirror: Scalars['Boolean']['input'];
     scope: LibraryShareScope;
     synced: Scalars['Boolean']['input'];
     username: Scalars['String']['input'];
@@ -1210,7 +1216,11 @@ export type LibraryShareType = {
     incoming: Scalars['Boolean']['output'];
     lastSyncedAt: Scalars['LongString']['output'];
     mangaCount: Scalars['Int']['output'];
+    mirror: Scalars['Boolean']['output'];
     pairedWith?: Maybe<Scalars['Int']['output']>;
+    proposalIsMine: Scalars['Boolean']['output'];
+    proposedMirror?: Maybe<Scalars['Boolean']['output']>;
+    proposedSynced?: Maybe<Scalars['Boolean']['output']>;
     recipientUsername: Scalars['String']['output'];
     respondedAt: Scalars['LongString']['output'];
     scope: LibraryShareScope;
@@ -1560,6 +1570,7 @@ export type Mutation = {
     bindTrack: BindTrackPayload;
     bindTrackRecord?: Maybe<BindTrackRecordPayload>;
     cancelLibraryShare: LibraryShareChangePayload;
+    cancelLibraryShareEdit: LibraryShareChangePayload;
     clearCachedImages: ClearCachedImagesPayload;
     clearCookiesAndCache: ClearCookiesAndCachePayload;
     clearDownloader?: Maybe<ClearDownloaderPayload>;
@@ -1603,16 +1614,20 @@ export type Mutation = {
     logout: LogoutPayload;
     logoutKoSyncAccount: LogoutKoSyncAccountPayload;
     logoutTracker: LogoutTrackerPayload;
+    proposeLibraryShareEdit: LibraryShareChangePayload;
     pullKoSyncProgress?: Maybe<PullKoSyncProgressPayload>;
     pushKoSyncProgress?: Maybe<PushKoSyncProgressPayload>;
+    recordMangaSwap: RecordMangaSwapPayload;
     refreshToken: RefreshTokenPayload;
     removeExtensionStore?: Maybe<RemoveExtensionStorePayload>;
+    removeLibraryShare: RemoveLibrarySharePayload;
     reorderChapterDownload?: Maybe<ReorderChapterDownloadPayload>;
     reorderChapterDownloads?: Maybe<ReorderChapterDownloadPayload>;
     requestTwoWayLibraryShare: LibraryShareChangePayload;
     resetSettings: ResetSettingsPayload;
     resetWebUIUpdateStatus?: Maybe<WebUiUpdateStatus>;
     respondToLibraryShare: LibraryShareChangePayload;
+    respondToLibraryShareEdit: LibraryShareChangePayload;
     restoreBackup: RestoreBackupPayload;
     setCategoryMeta?: Maybe<SetCategoryMetaPayload>;
     setCategoryMetas?: Maybe<SetCategoryMetasPayload>;
@@ -1667,6 +1682,10 @@ export type MutationBindTrackRecordArgs = {
 
 export type MutationCancelLibraryShareArgs = {
     input: CancelLibraryShareInput;
+};
+
+export type MutationCancelLibraryShareEditArgs = {
+    input: CancelLibraryShareEditInput;
 };
 
 export type MutationClearCachedImagesArgs = {
@@ -1833,6 +1852,10 @@ export type MutationLogoutTrackerArgs = {
     input: LogoutTrackerInput;
 };
 
+export type MutationProposeLibraryShareEditArgs = {
+    input: ProposeLibraryShareEditInput;
+};
+
 export type MutationPullKoSyncProgressArgs = {
     input: PullKoSyncProgressInput;
 };
@@ -1841,12 +1864,20 @@ export type MutationPushKoSyncProgressArgs = {
     input: PushKoSyncProgressInput;
 };
 
+export type MutationRecordMangaSwapArgs = {
+    input: RecordMangaSwapInput;
+};
+
 export type MutationRefreshTokenArgs = {
     input: RefreshTokenInput;
 };
 
 export type MutationRemoveExtensionStoreArgs = {
     input: RemoveExtensionStoreInput;
+};
+
+export type MutationRemoveLibraryShareArgs = {
+    input: RemoveLibraryShareInput;
 };
 
 export type MutationReorderChapterDownloadArgs = {
@@ -1867,6 +1898,10 @@ export type MutationResetSettingsArgs = {
 
 export type MutationRespondToLibraryShareArgs = {
     input: RespondToLibraryShareInput;
+};
+
+export type MutationRespondToLibraryShareEditArgs = {
+    input: RespondToLibraryShareEditInput;
 };
 
 export type MutationRestoreBackupArgs = {
@@ -2301,6 +2336,13 @@ export type Preference =
     | MultiSelectListPreference
     | SwitchPreference;
 
+export type ProposeLibraryShareEditInput = {
+    clientMutationId?: InputMaybe<Scalars['String']['input']>;
+    id: Scalars['Int']['input'];
+    mirror: Scalars['Boolean']['input'];
+    synced: Scalars['Boolean']['input'];
+};
+
 export type PullKoSyncProgressInput = {
     chapterId: Scalars['Int']['input'];
     clientMutationId?: InputMaybe<Scalars['String']['input']>;
@@ -2517,6 +2559,17 @@ export type QueryValidateBackupArgs = {
     input: ValidateBackupInput;
 };
 
+export type RecordMangaSwapInput = {
+    clientMutationId?: InputMaybe<Scalars['String']['input']>;
+    newMangaId: Scalars['Int']['input'];
+    oldMangaId: Scalars['Int']['input'];
+};
+
+export type RecordMangaSwapPayload = {
+    __typename?: 'RecordMangaSwapPayload';
+    clientMutationId?: Maybe<Scalars['String']['output']>;
+};
+
 export type RefreshTokenInput = {
     clientMutationId?: InputMaybe<Scalars['String']['input']>;
     refreshToken: Scalars['String']['input'];
@@ -2537,6 +2590,17 @@ export type RemoveExtensionStorePayload = {
     __typename?: 'RemoveExtensionStorePayload';
     clientMutationId?: Maybe<Scalars['String']['output']>;
     extensionStore?: Maybe<ExtensionStoreType>;
+};
+
+export type RemoveLibraryShareInput = {
+    clientMutationId?: InputMaybe<Scalars['String']['input']>;
+    id: Scalars['Int']['input'];
+};
+
+export type RemoveLibrarySharePayload = {
+    __typename?: 'RemoveLibrarySharePayload';
+    clientMutationId?: Maybe<Scalars['String']['output']>;
+    removedId: Scalars['Int']['output'];
 };
 
 export type ReorderChapterDownloadInput = {
@@ -2569,6 +2633,12 @@ export type ResetSettingsPayload = {
     __typename?: 'ResetSettingsPayload';
     clientMutationId?: Maybe<Scalars['String']['output']>;
     settings: SettingsType;
+};
+
+export type RespondToLibraryShareEditInput = {
+    accept: Scalars['Boolean']['input'];
+    clientMutationId?: InputMaybe<Scalars['String']['input']>;
+    id: Scalars['Int']['input'];
 };
 
 export type RespondToLibraryShareInput = {

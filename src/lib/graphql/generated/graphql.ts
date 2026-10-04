@@ -2009,6 +2009,10 @@ export type LibraryShareFieldsFragment = {
     lastSyncedAt: string;
     pairedWith: number | null;
     twoWayStatus: Types.LibraryShareStatus | null;
+    mirror: boolean;
+    proposedSynced: boolean | null;
+    proposedMirror: boolean | null;
+    proposalIsMine: boolean;
 };
 
 export type CreateLibraryShareMutationVariables = Exact<{
@@ -2036,6 +2040,10 @@ export type CreateLibraryShareMutation = {
             lastSyncedAt: string;
             pairedWith: number | null;
             twoWayStatus: Types.LibraryShareStatus | null;
+            mirror: boolean;
+            proposedSynced: boolean | null;
+            proposedMirror: boolean | null;
+            proposalIsMine: boolean;
         };
     };
 };
@@ -2066,8 +2074,120 @@ export type RespondToLibraryShareMutation = {
             lastSyncedAt: string;
             pairedWith: number | null;
             twoWayStatus: Types.LibraryShareStatus | null;
+            mirror: boolean;
+            proposedSynced: boolean | null;
+            proposedMirror: boolean | null;
+            proposalIsMine: boolean;
         };
     };
+};
+
+export type ProposeLibraryShareEditMutationVariables = Exact<{
+    input: Types.ProposeLibraryShareEditInput;
+}>;
+
+export type ProposeLibraryShareEditMutation = {
+    __typename: 'Mutation';
+    proposeLibraryShareEdit: {
+        __typename: 'LibraryShareChangePayload';
+        share: {
+            __typename: 'LibraryShareType';
+            id: number;
+            incoming: boolean;
+            senderUsername: string;
+            recipientUsername: string;
+            scope: Types.LibraryShareScope;
+            categoryNames: Array<string>;
+            mangaCount: number;
+            status: Types.LibraryShareStatus;
+            createdAt: string;
+            respondedAt: string;
+            synced: boolean;
+            autoSync: boolean;
+            lastSyncedAt: string;
+            pairedWith: number | null;
+            twoWayStatus: Types.LibraryShareStatus | null;
+            mirror: boolean;
+            proposedSynced: boolean | null;
+            proposedMirror: boolean | null;
+            proposalIsMine: boolean;
+        };
+    };
+};
+
+export type RespondToLibraryShareEditMutationVariables = Exact<{
+    input: Types.RespondToLibraryShareEditInput;
+}>;
+
+export type RespondToLibraryShareEditMutation = {
+    __typename: 'Mutation';
+    respondToLibraryShareEdit: {
+        __typename: 'LibraryShareChangePayload';
+        share: {
+            __typename: 'LibraryShareType';
+            id: number;
+            incoming: boolean;
+            senderUsername: string;
+            recipientUsername: string;
+            scope: Types.LibraryShareScope;
+            categoryNames: Array<string>;
+            mangaCount: number;
+            status: Types.LibraryShareStatus;
+            createdAt: string;
+            respondedAt: string;
+            synced: boolean;
+            autoSync: boolean;
+            lastSyncedAt: string;
+            pairedWith: number | null;
+            twoWayStatus: Types.LibraryShareStatus | null;
+            mirror: boolean;
+            proposedSynced: boolean | null;
+            proposedMirror: boolean | null;
+            proposalIsMine: boolean;
+        };
+    };
+};
+
+export type CancelLibraryShareEditMutationVariables = Exact<{
+    input: Types.CancelLibraryShareEditInput;
+}>;
+
+export type CancelLibraryShareEditMutation = {
+    __typename: 'Mutation';
+    cancelLibraryShareEdit: {
+        __typename: 'LibraryShareChangePayload';
+        share: {
+            __typename: 'LibraryShareType';
+            id: number;
+            incoming: boolean;
+            senderUsername: string;
+            recipientUsername: string;
+            scope: Types.LibraryShareScope;
+            categoryNames: Array<string>;
+            mangaCount: number;
+            status: Types.LibraryShareStatus;
+            createdAt: string;
+            respondedAt: string;
+            synced: boolean;
+            autoSync: boolean;
+            lastSyncedAt: string;
+            pairedWith: number | null;
+            twoWayStatus: Types.LibraryShareStatus | null;
+            mirror: boolean;
+            proposedSynced: boolean | null;
+            proposedMirror: boolean | null;
+            proposalIsMine: boolean;
+        };
+    };
+};
+
+export type RemoveLibraryShareMutationVariables = Exact<{
+    input: Types.RemoveLibraryShareInput;
+}>;
+
+export type RemoveLibraryShareMutation = {
+    __typename: 'Mutation';
+    removeLibraryShare: { __typename: 'RemoveLibrarySharePayload'; removedId: number };
 };
 
 export type CancelLibraryShareMutationVariables = Exact<{
@@ -2095,6 +2215,10 @@ export type CancelLibraryShareMutation = {
             lastSyncedAt: string;
             pairedWith: number | null;
             twoWayStatus: Types.LibraryShareStatus | null;
+            mirror: boolean;
+            proposedSynced: boolean | null;
+            proposedMirror: boolean | null;
+            proposalIsMine: boolean;
         };
     };
 };
@@ -2124,6 +2248,10 @@ export type SetLibraryShareAutoSyncMutation = {
             lastSyncedAt: string;
             pairedWith: number | null;
             twoWayStatus: Types.LibraryShareStatus | null;
+            mirror: boolean;
+            proposedSynced: boolean | null;
+            proposedMirror: boolean | null;
+            proposalIsMine: boolean;
         };
     };
 };
@@ -2154,6 +2282,10 @@ export type SyncLibraryShareMutation = {
             lastSyncedAt: string;
             pairedWith: number | null;
             twoWayStatus: Types.LibraryShareStatus | null;
+            mirror: boolean;
+            proposedSynced: boolean | null;
+            proposedMirror: boolean | null;
+            proposalIsMine: boolean;
         };
     };
 };
@@ -2183,8 +2315,21 @@ export type RequestTwoWayLibraryShareMutation = {
             lastSyncedAt: string;
             pairedWith: number | null;
             twoWayStatus: Types.LibraryShareStatus | null;
+            mirror: boolean;
+            proposedSynced: boolean | null;
+            proposedMirror: boolean | null;
+            proposalIsMine: boolean;
         };
     };
+};
+
+export type RecordMangaSwapMutationVariables = Exact<{
+    input: Types.RecordMangaSwapInput;
+}>;
+
+export type RecordMangaSwapMutation = {
+    __typename: 'Mutation';
+    recordMangaSwap: { __typename: 'RecordMangaSwapPayload'; clientMutationId: string | null };
 };
 
 export type GetLibrarySharesQueryVariables = Exact<{ [key: string]: never }>;
@@ -2208,6 +2353,10 @@ export type GetLibrarySharesQuery = {
         lastSyncedAt: string;
         pairedWith: number | null;
         twoWayStatus: Types.LibraryShareStatus | null;
+        mirror: boolean;
+        proposedSynced: boolean | null;
+        proposedMirror: boolean | null;
+        proposalIsMine: boolean;
     }>;
 };
 

@@ -7,6 +7,7 @@
  */
 
 import { requestManager } from '@/lib/requests/RequestManager.ts';
+import { defaultPromiseErrorHandler } from '@/lib/DefaultPromiseErrorHandler.ts';
 import type { SetChapterMetasItemInput } from '@/lib/graphql/generated/graphql-base.types.ts';
 import type { MangaIdInfo } from '@/features/manga/Manga.types.ts';
 import { Chapters } from '@/features/chapter/services/Chapters.ts';
@@ -68,6 +69,13 @@ export class MangaMigration {
                 await Promise.all(actions.flatMap((action) => action[migrationAction]()));
             }
         };
+
+        if (mode === 'migrate') {
+            // shared libraries move the other accounts' progress to the new series, a failure here must not stop the migration
+            await requestManager
+                .recordMangaSwap(mangaToMigrate.id, mangaToMigrateTo.id)
+                .response.catch(defaultPromiseErrorHandler('MangaMigration::recordMangaSwap'));
+        }
 
         await performMigrationActions(
             [

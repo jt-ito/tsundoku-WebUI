@@ -774,7 +774,11 @@ export type LibraryShareTypeKeySpecifier = (
     | 'incoming'
     | 'lastSyncedAt'
     | 'mangaCount'
+    | 'mirror'
     | 'pairedWith'
+    | 'proposalIsMine'
+    | 'proposedMirror'
+    | 'proposedSynced'
     | 'recipientUsername'
     | 'respondedAt'
     | 'scope'
@@ -792,7 +796,11 @@ export type LibraryShareTypeFieldPolicy = {
     incoming?: FieldPolicy<any> | FieldReadFunction<any>;
     lastSyncedAt?: FieldPolicy<any> | FieldReadFunction<any>;
     mangaCount?: FieldPolicy<any> | FieldReadFunction<any>;
+    mirror?: FieldPolicy<any> | FieldReadFunction<any>;
     pairedWith?: FieldPolicy<any> | FieldReadFunction<any>;
+    proposalIsMine?: FieldPolicy<any> | FieldReadFunction<any>;
+    proposedMirror?: FieldPolicy<any> | FieldReadFunction<any>;
+    proposedSynced?: FieldPolicy<any> | FieldReadFunction<any>;
     recipientUsername?: FieldPolicy<any> | FieldReadFunction<any>;
     respondedAt?: FieldPolicy<any> | FieldReadFunction<any>;
     scope?: FieldPolicy<any> | FieldReadFunction<any>;
@@ -1034,6 +1042,7 @@ export type MutationKeySpecifier = (
     | 'bindTrack'
     | 'bindTrackRecord'
     | 'cancelLibraryShare'
+    | 'cancelLibraryShareEdit'
     | 'clearCachedImages'
     | 'clearCookiesAndCache'
     | 'clearDownloader'
@@ -1075,16 +1084,20 @@ export type MutationKeySpecifier = (
     | 'logout'
     | 'logoutKoSyncAccount'
     | 'logoutTracker'
+    | 'proposeLibraryShareEdit'
     | 'pullKoSyncProgress'
     | 'pushKoSyncProgress'
+    | 'recordMangaSwap'
     | 'refreshToken'
     | 'removeExtensionStore'
+    | 'removeLibraryShare'
     | 'reorderChapterDownload'
     | 'reorderChapterDownloads'
     | 'requestTwoWayLibraryShare'
     | 'resetSettings'
     | 'resetWebUIUpdateStatus'
     | 'respondToLibraryShare'
+    | 'respondToLibraryShareEdit'
     | 'restoreBackup'
     | 'setCategoryMeta'
     | 'setCategoryMetas'
@@ -1130,6 +1143,7 @@ export type MutationFieldPolicy = {
     bindTrack?: FieldPolicy<any> | FieldReadFunction<any>;
     bindTrackRecord?: FieldPolicy<any> | FieldReadFunction<any>;
     cancelLibraryShare?: FieldPolicy<any> | FieldReadFunction<any>;
+    cancelLibraryShareEdit?: FieldPolicy<any> | FieldReadFunction<any>;
     clearCachedImages?: FieldPolicy<any> | FieldReadFunction<any>;
     clearCookiesAndCache?: FieldPolicy<any> | FieldReadFunction<any>;
     clearDownloader?: FieldPolicy<any> | FieldReadFunction<any>;
@@ -1171,16 +1185,20 @@ export type MutationFieldPolicy = {
     logout?: FieldPolicy<any> | FieldReadFunction<any>;
     logoutKoSyncAccount?: FieldPolicy<any> | FieldReadFunction<any>;
     logoutTracker?: FieldPolicy<any> | FieldReadFunction<any>;
+    proposeLibraryShareEdit?: FieldPolicy<any> | FieldReadFunction<any>;
     pullKoSyncProgress?: FieldPolicy<any> | FieldReadFunction<any>;
     pushKoSyncProgress?: FieldPolicy<any> | FieldReadFunction<any>;
+    recordMangaSwap?: FieldPolicy<any> | FieldReadFunction<any>;
     refreshToken?: FieldPolicy<any> | FieldReadFunction<any>;
     removeExtensionStore?: FieldPolicy<any> | FieldReadFunction<any>;
+    removeLibraryShare?: FieldPolicy<any> | FieldReadFunction<any>;
     reorderChapterDownload?: FieldPolicy<any> | FieldReadFunction<any>;
     reorderChapterDownloads?: FieldPolicy<any> | FieldReadFunction<any>;
     requestTwoWayLibraryShare?: FieldPolicy<any> | FieldReadFunction<any>;
     resetSettings?: FieldPolicy<any> | FieldReadFunction<any>;
     resetWebUIUpdateStatus?: FieldPolicy<any> | FieldReadFunction<any>;
     respondToLibraryShare?: FieldPolicy<any> | FieldReadFunction<any>;
+    respondToLibraryShareEdit?: FieldPolicy<any> | FieldReadFunction<any>;
     restoreBackup?: FieldPolicy<any> | FieldReadFunction<any>;
     setCategoryMeta?: FieldPolicy<any> | FieldReadFunction<any>;
     setCategoryMetas?: FieldPolicy<any> | FieldReadFunction<any>;
@@ -1557,6 +1575,10 @@ export type QueryFieldPolicy = {
     users?: FieldPolicy<any> | FieldReadFunction<any>;
     validateBackup?: FieldPolicy<any> | FieldReadFunction<any>;
 };
+export type RecordMangaSwapPayloadKeySpecifier = ('clientMutationId' | RecordMangaSwapPayloadKeySpecifier)[];
+export type RecordMangaSwapPayloadFieldPolicy = {
+    clientMutationId?: FieldPolicy<any> | FieldReadFunction<any>;
+};
 export type RefreshTokenPayloadKeySpecifier = ('accessToken' | 'clientMutationId' | RefreshTokenPayloadKeySpecifier)[];
 export type RefreshTokenPayloadFieldPolicy = {
     accessToken?: FieldPolicy<any> | FieldReadFunction<any>;
@@ -1570,6 +1592,15 @@ export type RemoveExtensionStorePayloadKeySpecifier = (
 export type RemoveExtensionStorePayloadFieldPolicy = {
     clientMutationId?: FieldPolicy<any> | FieldReadFunction<any>;
     extensionStore?: FieldPolicy<any> | FieldReadFunction<any>;
+};
+export type RemoveLibrarySharePayloadKeySpecifier = (
+    | 'clientMutationId'
+    | 'removedId'
+    | RemoveLibrarySharePayloadKeySpecifier
+)[];
+export type RemoveLibrarySharePayloadFieldPolicy = {
+    clientMutationId?: FieldPolicy<any> | FieldReadFunction<any>;
+    removedId?: FieldPolicy<any> | FieldReadFunction<any>;
 };
 export type ReorderChapterDownloadPayloadKeySpecifier = (
     | 'clientMutationId'
@@ -3213,6 +3244,10 @@ export type StrictTypedTypePolicies = {
         keyFields?: false | QueryKeySpecifier | (() => undefined | QueryKeySpecifier);
         fields?: QueryFieldPolicy;
     };
+    RecordMangaSwapPayload?: Omit<TypePolicy, 'fields' | 'keyFields'> & {
+        keyFields?: false | RecordMangaSwapPayloadKeySpecifier | (() => undefined | RecordMangaSwapPayloadKeySpecifier);
+        fields?: RecordMangaSwapPayloadFieldPolicy;
+    };
     RefreshTokenPayload?: Omit<TypePolicy, 'fields' | 'keyFields'> & {
         keyFields?: false | RefreshTokenPayloadKeySpecifier | (() => undefined | RefreshTokenPayloadKeySpecifier);
         fields?: RefreshTokenPayloadFieldPolicy;
@@ -3223,6 +3258,13 @@ export type StrictTypedTypePolicies = {
             | RemoveExtensionStorePayloadKeySpecifier
             | (() => undefined | RemoveExtensionStorePayloadKeySpecifier);
         fields?: RemoveExtensionStorePayloadFieldPolicy;
+    };
+    RemoveLibrarySharePayload?: Omit<TypePolicy, 'fields' | 'keyFields'> & {
+        keyFields?:
+            | false
+            | RemoveLibrarySharePayloadKeySpecifier
+            | (() => undefined | RemoveLibrarySharePayloadKeySpecifier);
+        fields?: RemoveLibrarySharePayloadFieldPolicy;
     };
     ReorderChapterDownloadPayload?: Omit<TypePolicy, 'fields' | 'keyFields'> & {
         keyFields?:

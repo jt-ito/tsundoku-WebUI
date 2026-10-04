@@ -35,6 +35,10 @@ import { useAppTitle } from '@/features/navigation-bar/hooks/useAppTitle.ts';
 import { CREATE_NEW_CATEGORY_ID } from '@/features/category/Category.constants.ts';
 import { CreateOrEditCategoryDialog } from '@/features/category/components/CreateOrEditCategoryDialog.tsx';
 
+// the default category has the id 0, which a drop target must not have: it is easily mistaken for "nothing under the cursor",
+// so dropping onto the default category (every move to the top of the list) did nothing
+const toDragId = (categoryId: number): string => `category-${categoryId}`;
+
 export function CategorySettings() {
     const { t } = useLingui();
     const dndSensors = DndKitUtil.useSensorsForDevice();
@@ -72,8 +76,8 @@ export function CategorySettings() {
             return;
         }
 
-        const oldIndex = categories.findIndex((category) => category.id === active.id);
-        const newIndex = categories.findIndex((category) => category.id === over.id);
+        const oldIndex = categories.findIndex((category) => toDragId(category.id) === active.id);
+        const newIndex = categories.findIndex((category) => toDragId(category.id) === over.id);
 
         categoryReorder(categories, oldIndex, newIndex);
     };
@@ -108,18 +112,23 @@ export function CategorySettings() {
                 sensors={dndSensors}
                 collisionDetection={closestCenter}
                 onDragStart={(event) =>
-                    setDndActiveCategory(categories.find((category) => category.id === event.active.id) ?? null)
+                    setDndActiveCategory(
+                        categories.find((category) => toDragId(category.id) === event.active.id) ?? null,
+                    )
                 }
                 onDragEnd={onDragEnd}
                 onDragCancel={() => setDndActiveCategory(null)}
                 onDragAbort={() => setDndActiveCategory(null)}
             >
                 <Box sx={{ paddingBottom: DEFAULT_FULL_FAB_HEIGHT }}>
-                    <SortableContext items={categories} strategy={verticalListSortingStrategy}>
+                    <SortableContext
+                        items={categories.map((category) => toDragId(category.id))}
+                        strategy={verticalListSortingStrategy}
+                    >
                         {categories.map((category, index) => (
                             <DndSortableItem
                                 key={category.id}
-                                id={category.id}
+                                id={toDragId(category.id)}
                                 isDragging={category.id === dndActiveCategory?.id}
                             >
                                 <CategorySettingsCard

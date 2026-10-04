@@ -34,6 +34,50 @@ export const RESPOND_TO_LIBRARY_SHARE = gql`
     }
 `;
 
+export const PROPOSE_LIBRARY_SHARE_EDIT = gql`
+    ${LIBRARY_SHARE_FIELDS}
+
+    mutation PROPOSE_LIBRARY_SHARE_EDIT($input: ProposeLibraryShareEditInput!) {
+        proposeLibraryShareEdit(input: $input) {
+            share {
+                ...LIBRARY_SHARE_FIELDS
+            }
+        }
+    }
+`;
+
+export const RESPOND_TO_LIBRARY_SHARE_EDIT = gql`
+    ${LIBRARY_SHARE_FIELDS}
+
+    mutation RESPOND_TO_LIBRARY_SHARE_EDIT($input: RespondToLibraryShareEditInput!) {
+        respondToLibraryShareEdit(input: $input) {
+            share {
+                ...LIBRARY_SHARE_FIELDS
+            }
+        }
+    }
+`;
+
+export const CANCEL_LIBRARY_SHARE_EDIT = gql`
+    ${LIBRARY_SHARE_FIELDS}
+
+    mutation CANCEL_LIBRARY_SHARE_EDIT($input: CancelLibraryShareEditInput!) {
+        cancelLibraryShareEdit(input: $input) {
+            share {
+                ...LIBRARY_SHARE_FIELDS
+            }
+        }
+    }
+`;
+
+export const REMOVE_LIBRARY_SHARE = gql`
+    mutation REMOVE_LIBRARY_SHARE($input: RemoveLibraryShareInput!) {
+        removeLibraryShare(input: $input) {
+            removedId
+        }
+    }
+`;
+
 export const CANCEL_LIBRARY_SHARE = gql`
     ${LIBRARY_SHARE_FIELDS}
 
@@ -79,6 +123,14 @@ export const REQUEST_TWO_WAY_LIBRARY_SHARE = gql`
             share {
                 ...LIBRARY_SHARE_FIELDS
             }
+        }
+    }
+`;
+
+export const RECORD_MANGA_SWAP = gql`
+    mutation RECORD_MANGA_SWAP($input: RecordMangaSwapInput!) {
+        recordMangaSwap(input: $input) {
+            clientMutationId
         }
     }
 `;

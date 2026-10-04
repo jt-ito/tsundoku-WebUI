@@ -134,6 +134,17 @@ msgstr "{0} / {1}"
 msgid "{0} / {1}{2}"
 msgstr "{0} / {1}{2}"
 
+#. placeholder {0}: otherOf(editing.shares[0])
+#: src/features/library/screens/LibraryShare.tsx
+msgid "{0} has to confirm the change before it applies."
+msgstr "{0} has to confirm the change before it applies."
+
+#. placeholder {0}: otherOf(share)
+#. placeholder {1}: describeSettings(!!share.proposedSynced, !!share.proposedMirror)
+#: src/features/library/screens/LibraryShare.tsx
+msgid "{0} wants to change your share: {1}"
+msgstr "{0} wants to change your share: {1}"
+
 #. placeholder {0}: share.senderUsername
 #. placeholder {1}: describe(share)
 #: src/features/library/screens/LibraryShare.tsx
@@ -416,6 +427,10 @@ msgstr "Accepted"
 msgid "Accepted, kept in sync"
 msgstr "Accepted, kept in sync"
 
+#: src/features/library/screens/LibraryShare.tsx
+msgid "Accepted, kept in sync, one for one"
+msgstr "Accepted, kept in sync, one for one"
+
 #: src/features/authentication/components/UserAccountsDialog.tsx
 #: src/features/authentication/components/UserProfileCard.tsx
 msgid "Accounts"
@@ -518,6 +533,10 @@ msgstr "Age rating"
 msgid "All"
 msgstr "All"
 
+#: src/features/reader/overlay/navigation/components/ReaderPageThumbnails.tsx
+msgid "All pages"
+msgstr "All pages"
+
 #: src/features/downloads/screens/DownloadSettings.tsx
 msgid "Allow deleting bookmarked chapters"
 msgstr "Allow deleting bookmarked chapters"
@@ -574,6 +593,10 @@ msgstr "Ask for two-way sync"
 #: src/features/library/screens/LibraryShare.tsx
 msgid "Ask the other person for their exact username, accounts can't be browsed"
 msgstr "Ask the other person for their exact username, accounts can't be browsed"
+
+#: src/features/library/screens/LibraryShare.tsx
+msgid "Ask to confirm"
+msgstr "Ask to confirm"
 
 #: src/features/settings/screens/ServerSettings.tsx
 msgid "Authentication"
@@ -871,6 +894,10 @@ msgstr "Cancel"
 msgid "Cancel all for this series"
 msgstr "Cancel all for this series"
 
+#: src/features/library/screens/LibraryShare.tsx
+msgid "Cancel change"
+msgstr "Cancel change"
+
 #: src/features/chapter/Chapter.constants.ts
 msgid "Cancel download"
 msgstr "Cancel download"
@@ -917,6 +944,20 @@ msgstr "Change categories"
 msgid "Change categories of selected"
 msgstr "Change categories of selected"
 
+#. placeholder {0}: otherOf(halves[0])
+#: src/features/library/screens/LibraryShare.tsx
+msgid "Change sent, {0} has to confirm it"
+msgstr "Change sent, {0} has to confirm it"
+
+#: src/features/library/screens/LibraryShare.tsx
+msgid "Change this share"
+msgstr "Change this share"
+
+#. placeholder {0}: otherOf(first)
+#: src/features/library/screens/LibraryShare.tsx
+msgid "Change waiting for {0} to confirm"
+msgstr "Change waiting for {0} to confirm"
+
 #: src/features/app-updates/components/ServerUpdateChecker.tsx
 #: src/features/app-updates/components/VersionUpdateInfoDialog.tsx
 #: src/features/app-updates/components/WebUIUpdateChecker.tsx
@@ -926,6 +967,10 @@ msgstr "Changelog"
 #: src/features/settings/screens/Appearance.tsx
 msgid "Changes the theme colors on the manga page based on the thumbnail"
 msgstr "Changes the theme colors on the manga page based on the thumbnail"
+
+#: src/features/library/screens/LibraryShare.tsx
+msgid "Changes waiting for your approval"
+msgstr "Changes waiting for your approval"
 
 #: src/features/settings/screens/WebUISettings.tsx
 msgid "Channel"
@@ -1037,6 +1082,7 @@ msgstr "Client data"
 #: src/base/components/feedback/SnackbarWithDescription.tsx
 #: src/features/app-updates/components/VersionUpdateInfoDialog.tsx
 #: src/features/migration/components/migration-entry/MigrationDestinationEntry.tsx
+#: src/features/reader/overlay/navigation/components/ReaderPageThumbnails.tsx
 #: src/features/webview/components/WebViewModal.tsx
 msgid "Close"
 msgstr "Close"
@@ -1157,6 +1203,10 @@ msgstr "Could not add extension store"
 #: src/features/manga/hooks/useManageMangaLibraryState.tsx
 msgid "Could not add manga to library!"
 msgstr "Could not add manga to library!"
+
+#: src/features/library/screens/LibraryShare.tsx
+msgid "Could not answer the change"
+msgstr "Could not answer the change"
 
 #: src/features/library/screens/LibraryShare.tsx
 msgid "Could not answer the request"
@@ -1304,6 +1354,10 @@ msgstr "Could not remove extension store \"{name}\""
 msgid "Could not remove non library manga from categories"
 msgstr "Could not remove non library manga from categories"
 
+#: src/features/library/screens/LibraryShare.tsx
+msgid "Could not remove the share"
+msgstr "Could not remove the share"
+
 #: src/features/library/components/LibraryOptionsPanel.tsx
 msgid "Could not reset filters"
 msgstr "Could not reset filters"
@@ -1355,6 +1409,10 @@ msgid "Could not search source"
 msgstr "Could not search source"
 
 #: src/features/library/screens/LibraryShare.tsx
+msgid "Could not send the change"
+msgstr "Could not send the change"
+
+#: src/features/library/screens/LibraryShare.tsx
 msgid "Could not send the request"
 msgstr "Could not send the request"
 
@@ -1370,6 +1428,10 @@ msgstr "Could not stop global update"
 #: src/features/library/screens/LibraryShare.tsx
 msgid "Could not sync"
 msgstr "Could not sync"
+
+#: src/features/library/screens/LibraryShare.tsx
+msgid "Could not take the change back"
+msgstr "Could not take the change back"
 
 #: src/features/manga/Manga.constants.ts
 #: src/features/tracker/components/TrackerSearch.tsx
@@ -1771,6 +1833,7 @@ msgstr "Edge"
 
 #: src/features/category/components/CategorySelect.tsx
 #: src/features/category/components/CategorySettingsCard.tsx
+#: src/features/library/screens/LibraryShare.tsx
 #: src/features/manga/components/details/MangaNotes.tsx
 #: src/features/theme/components/ThemePreview.tsx
 msgid "Edit"
@@ -2123,8 +2186,8 @@ msgstr "Forget manga categories"
 msgid "Fourth to last read chapter"
 msgstr "Fourth to last read chapter"
 
-#. placeholder {0}: share.senderUsername
-#. placeholder {1}: describe(share)
+#. placeholder {0}: first.senderUsername
+#. placeholder {1}: describe(first)
 #: src/features/library/screens/LibraryShare.tsx
 msgid "From {0}: {1}"
 msgstr "From {0}: {1}"
@@ -2445,6 +2508,18 @@ msgstr "JWT audience claim"
 #: src/features/settings/screens/ServerSettings.tsx
 msgid "JWT refresh token expiry"
 msgstr "JWT refresh token expiry"
+
+#: src/features/library/screens/LibraryShare.tsx
+msgid "keep in sync"
+msgstr "keep in sync"
+
+#: src/features/library/screens/LibraryShare.tsx
+msgid "keep in sync, one for one"
+msgstr "keep in sync, one for one"
+
+#: src/features/library/screens/LibraryShare.tsx
+msgid "Keep in sync: manga and categories added later are shared too"
+msgstr "Keep in sync: manga and categories added later are shared too"
 
 #: src/features/library/screens/LibraryShare.tsx
 msgid "Keep in sync: manga and categories you add later are shared too"
@@ -3041,6 +3116,11 @@ msgstr "Nothing is added until you accept. The sender keeps it in sync: manga an
 msgid "Novel"
 msgstr "Novel"
 
+#. placeholder {0}: describeSettings(share.synced, share.mirror)
+#: src/features/library/screens/LibraryShare.tsx
+msgid "Now: {0}"
+msgstr "Now: {0}"
+
 #: src/features/browse/screens/BrowseSettings.tsx
 msgid "NSFW (18+) sources"
 msgstr "NSFW (18+) sources"
@@ -3095,6 +3175,10 @@ msgstr "Offset double spreads"
 #: src/features/tracker/components/cards/TrackerActiveCard.tsx
 msgid "Ok"
 msgstr "Ok"
+
+#: src/features/library/screens/LibraryShare.tsx
+msgid "One for one: renaming a shared category on either side renames it on the other side too"
+msgstr "One for one: renaming a shared category on either side renames it on the other side too"
 
 #: src/features/tracker/Tracker.constants.ts
 msgid "Oneshot"
@@ -3202,6 +3286,11 @@ msgstr "Page"
 #: src/features/reader/settings/layout/components/ReaderSettingPageGap.tsx
 msgid "Page gap"
 msgstr "Page gap"
+
+#: src/features/reader/overlay/navigation/desktop/quick-settings/ReaderNavBarDesktopQuickSettings.tsx
+#: src/features/reader/overlay/navigation/mobile/ReaderBottomBarMobile.tsx
+msgid "Pages"
+msgstr "Pages"
 
 #: src/features/browse/screens/BrowseSettings.tsx
 msgid "Parallel source requests"
@@ -3391,6 +3480,7 @@ msgid "Remind later"
 msgstr "Remind later"
 
 #: src/base/components/settings/DateSetting.tsx
+#: src/features/library/screens/LibraryShare.tsx
 #: src/features/manga/hooks/useManageMangaLibraryState.tsx
 #: src/features/tracker/components/cards/TrackerActiveCard.tsx
 msgid "Remove"
@@ -3430,6 +3520,10 @@ msgstr "Remove non library manga from categories"
 #: src/features/manga/Manga.constants.ts
 msgid "Remove selected from the library"
 msgstr "Remove selected from the library"
+
+#: src/features/library/screens/LibraryShare.tsx
+msgid "Remove this share?"
+msgstr "Remove this share?"
 
 #: src/features/library/screens/LibrarySettings.tsx
 msgid "Removed non library manga from categories"
@@ -3707,12 +3801,22 @@ msgid "Send as is"
 msgstr "Send as is"
 
 #: src/features/library/screens/LibraryShare.tsx
+msgid "send as is, no syncing"
+msgstr "send as is, no syncing"
+
+#: src/features/library/screens/LibraryShare.tsx
 msgid "Send request"
 msgstr "Send request"
 
 #: src/features/library/screens/LibrarySettings.tsx
 msgid "Send your library or some categories to another account"
 msgstr "Send your library or some categories to another account"
+
+#. placeholder {0}: sent.mangaCount
+#. placeholder {1}: received.mangaCount
+#: src/features/library/screens/LibraryShare.tsx
+msgid "Sent {0} manga, received {1} manga"
+msgstr "Sent {0} manga, received {1} manga"
 
 #: src/features/reader/filters/settings/components/ReaderSettingSepia.tsx
 msgid "Sepia"
@@ -4148,6 +4252,11 @@ msgstr "Sync to an older state"
 msgid "Sync will not be triggered if the progress difference is within this tolerance."
 msgstr "Sync will not be triggered if the progress difference is within this tolerance."
 
+#. placeholder {0}: otherOf(halves[0])
+#: src/features/library/screens/LibraryShare.tsx
+msgid "Syncing with {0} ends right away for both of you. What was already copied stays in the libraries."
+msgstr "Syncing with {0} ends right away for both of you. What was already copied stays in the libraries."
+
 #: src/features/settings/screens/ServerSettings.tsx
 msgid "SyncYomi"
 msgstr "SyncYomi"
@@ -4319,8 +4428,8 @@ msgstr "This will remove the tracking locally."
 msgid "Tiny"
 msgstr "Tiny"
 
-#. placeholder {0}: share.recipientUsername
-#. placeholder {1}: describe(share)
+#. placeholder {0}: first.recipientUsername
+#. placeholder {1}: describe(first)
 #: src/features/library/screens/LibraryShare.tsx
 msgid "To {0}: {1}"
 msgstr "To {0}: {1}"
@@ -4419,6 +4528,10 @@ msgstr "Two-way sync"
 #: src/features/library/screens/LibraryShare.tsx
 msgid "Two-way sync active"
 msgstr "Two-way sync active"
+
+#: src/features/library/screens/LibraryShare.tsx
+msgid "Two-way sync, one for one"
+msgstr "Two-way sync, one for one"
 
 #: src/features/settings/screens/ServerSettings.tsx
 #: src/features/tracker/components/cards/TrackerMangaCard.tsx
@@ -4728,6 +4841,12 @@ msgstr "White"
 #: src/features/settings/Settings.constants.ts
 msgid "With \"Completed\" status"
 msgstr "With \"Completed\" status"
+
+#. placeholder {0}: otherOf(first)
+#. placeholder {1}: describe(first)
+#: src/features/library/screens/LibraryShare.tsx
+msgid "With {0}: {1}"
+msgstr "With {0}: {1}"
 
 #: src/features/global-search/screens/SearchAll.tsx
 msgid "with results"

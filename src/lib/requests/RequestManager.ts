@@ -215,6 +215,16 @@ import type {
     RespondToLibraryShareMutationVariables,
     CancelLibraryShareMutation,
     CancelLibraryShareMutationVariables,
+    CancelLibraryShareEditMutation,
+    CancelLibraryShareEditMutationVariables,
+    ProposeLibraryShareEditMutation,
+    ProposeLibraryShareEditMutationVariables,
+    RemoveLibraryShareMutation,
+    RecordMangaSwapMutation,
+    RecordMangaSwapMutationVariables,
+    RemoveLibraryShareMutationVariables,
+    RespondToLibraryShareEditMutation,
+    RespondToLibraryShareEditMutationVariables,
     RequestTwoWayLibraryShareMutation,
     RequestTwoWayLibraryShareMutationVariables,
     SetLibraryShareAutoSyncMutation,
@@ -378,7 +388,12 @@ import { GET_ME, GET_USERS } from '@/lib/graphql/user/UserQuery.ts';
 import { GET_LIBRARY_SHARES } from '@/lib/graphql/libraryShare/LibraryShareQuery.ts';
 import {
     CANCEL_LIBRARY_SHARE,
+    CANCEL_LIBRARY_SHARE_EDIT,
     CREATE_LIBRARY_SHARE,
+    PROPOSE_LIBRARY_SHARE_EDIT,
+    RECORD_MANGA_SWAP,
+    REMOVE_LIBRARY_SHARE,
+    RESPOND_TO_LIBRARY_SHARE_EDIT,
     REQUEST_TWO_WAY_LIBRARY_SHARE,
     RESPOND_TO_LIBRARY_SHARE,
     SET_LIBRARY_SHARE_AUTO_SYNC,
@@ -3061,7 +3076,8 @@ export class RequestManager {
             GQLMethod.USE_MUTATION,
             UPDATE_CATEGORY_ORDER,
             undefined,
-            { refetchQueries: [GET_CATEGORIES_BASE, GET_CATEGORIES_LIBRARY], ...options },
+            // the settings list too, so what the screen shows is what the server stored
+            { refetchQueries: [GET_CATEGORIES_BASE, GET_CATEGORIES_LIBRARY, GET_CATEGORIES_SETTINGS], ...options },
         );
 
         const wrappedMutate = (mutateOptions: Parameters<typeof mutate>[0]) => {
@@ -3085,9 +3101,9 @@ export class RequestManager {
             const movedIndex = cachedCategories.findIndex((category) => category.id === variables.id);
             const newData = [...cachedCategories.map((category) => ({ ...category }))];
             const [removed] = newData.splice(movedIndex, 1);
-            newData.splice(variables.position, 0, removed);
-            removed.order = variables.position;
-            newData[movedIndex].order = movedIndex;
+            // "position" is 1-based and the list holds every category including the default one, like the screen does
+            newData.splice(variables.position - 1, 0, removed);
+            const orderedData = newData.map((category, index) => ({ ...category, order: index }));
 
             return mutate({
                 update: (cache) => {
@@ -3101,7 +3117,7 @@ export class RequestManager {
                             ...data!,
                             categories: {
                                 ...data!.categories,
-                                nodes: newData,
+                                nodes: orderedData,
                             },
                         }),
                     );
@@ -3110,7 +3126,7 @@ export class RequestManager {
                     __typename: 'Mutation',
                     updateCategoryOrder: {
                         __typename: 'UpdateCategoryOrderPayload',
-                        categories: newData,
+                        categories: orderedData,
                     },
                 },
                 ...mutateOptions,
@@ -4057,6 +4073,75 @@ export class RequestManager {
                 update: accept ? evictLibraryData : undefined,
                 ...options,
             },
+        );
+    }
+
+    public proposeLibraryShareEdit(
+        id: number,
+        synced: boolean,
+        mirror: boolean,
+        options?: MutationOptions<ProposeLibraryShareEditMutation, ProposeLibraryShareEditMutationVariables>,
+    ): AbortableApolloMutationResponse<ProposeLibraryShareEditMutation> {
+        return this.doRequest<ProposeLibraryShareEditMutation, ProposeLibraryShareEditMutationVariables>(
+            GQLMethod.MUTATION,
+            PROPOSE_LIBRARY_SHARE_EDIT,
+            { input: { id, synced, mirror } },
+            { refetchQueries: [GET_LIBRARY_SHARES], ...options },
+        );
+    }
+
+    public respondToLibraryShareEdit(
+        id: number,
+        accept: boolean,
+        options?: MutationOptions<RespondToLibraryShareEditMutation, RespondToLibraryShareEditMutationVariables>,
+    ): AbortableApolloMutationResponse<RespondToLibraryShareEditMutation> {
+        return this.doRequest<RespondToLibraryShareEditMutation, RespondToLibraryShareEditMutationVariables>(
+            GQLMethod.MUTATION,
+            RESPOND_TO_LIBRARY_SHARE_EDIT,
+            { input: { id, accept } },
+            // an accepted change can add manga and categories to the library
+            { refetchQueries: [GET_LIBRARY_SHARES], update: accept ? evictLibraryData : undefined, ...options },
+        );
+    }
+
+    public cancelLibraryShareEdit(
+        id: number,
+        options?: MutationOptions<CancelLibraryShareEditMutation, CancelLibraryShareEditMutationVariables>,
+    ): AbortableApolloMutationResponse<CancelLibraryShareEditMutation> {
+        return this.doRequest<CancelLibraryShareEditMutation, CancelLibraryShareEditMutationVariables>(
+            GQLMethod.MUTATION,
+            CANCEL_LIBRARY_SHARE_EDIT,
+            { input: { id } },
+            { refetchQueries: [GET_LIBRARY_SHARES], ...options },
+        );
+    }
+
+    /**
+     * Tells the server that a series was replaced by another one (migration), so shared libraries can move the
+     * other accounts' reading progress and trackers along
+     */
+    public recordMangaSwap(
+        oldMangaId: number,
+        newMangaId: number,
+        options?: MutationOptions<RecordMangaSwapMutation, RecordMangaSwapMutationVariables>,
+    ): AbortableApolloMutationResponse<RecordMangaSwapMutation> {
+        return this.doRequest<RecordMangaSwapMutation, RecordMangaSwapMutationVariables>(
+            GQLMethod.MUTATION,
+            RECORD_MANGA_SWAP,
+            { input: { oldMangaId, newMangaId } },
+            options,
+        );
+    }
+
+    public removeLibraryShare(
+        id: number,
+        options?: MutationOptions<RemoveLibraryShareMutation, RemoveLibraryShareMutationVariables>,
+    ): AbortableApolloMutationResponse<RemoveLibraryShareMutation> {
+        return this.doRequest<RemoveLibraryShareMutation, RemoveLibraryShareMutationVariables>(
+            GQLMethod.MUTATION,
+            REMOVE_LIBRARY_SHARE,
+            { input: { id } },
+            { refetchQueries: [GET_LIBRARY_SHARES], ...options },
         );
     }
 
