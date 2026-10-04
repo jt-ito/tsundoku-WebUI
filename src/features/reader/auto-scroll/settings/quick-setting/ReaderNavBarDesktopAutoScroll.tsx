@@ -18,6 +18,7 @@ import { useLingui } from '@lingui/react/macro';
 import { plural } from '@lingui/core/macro';
 import type { IReaderSettings } from '@/features/reader/Reader.types.ts';
 import { AUTO_SCROLL_SPEED } from '@/features/reader/settings/ReaderSettings.constants.tsx';
+import { TONAL_BUTTON_SX } from '@/features/reader/overlay/navigation/ReaderNavTonalButton.ts';
 import { coerceIn } from '@/lib/HelperFunctions.ts';
 import { getReaderAutoScrollStore, useReaderAutoScrollStore } from '@/features/reader/stores/ReaderStore.ts';
 
@@ -35,11 +36,11 @@ export const ReaderNavBarDesktopAutoScroll = ({
     return (
         <Stack sx={{ flexDirection: 'row', gap: 1 }}>
             <Button
-                sx={{ justifyContent: 'start', textTransform: 'unset', flexGrow: 1 }}
+                sx={isActive ? { justifyContent: 'start', flexGrow: 1 } : { ...TONAL_BUTTON_SX, flexGrow: 1 }}
                 size="large"
                 onClick={() => getReaderAutoScrollStore().toggleActive()}
                 color={isActive ? 'secondary' : 'primary'}
-                variant="contained"
+                variant={isActive ? 'contained' : 'text'}
                 startIcon={isActive ? <PauseCircleFilledIcon /> : <PlayCircleFilledIcon />}
             >
                 {t`Auto scroll`}

@@ -111,7 +111,7 @@ const BaseReaderNavBarDesktop = ({
             }}
         >
             <ReaderNavContainer sx={{ backgroundColor: 'background.paper', pointerEvents: 'all' }}>
-                <Stack sx={{ p: 2, gap: 2, backgroundColor: 'action.hover' }}>
+                <Stack sx={{ p: 2, gap: 2, backgroundColor: 'action.hover', borderRadius: '0 0 16px 16px' }}>
                     <Stack sx={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
                         <ReaderExitButton />
                         <CustomTooltip title={t`Static navigation`}>

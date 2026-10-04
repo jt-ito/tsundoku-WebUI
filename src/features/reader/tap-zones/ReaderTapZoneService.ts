@@ -25,9 +25,10 @@ interface InvertMode extends TapZoneInvertMode {
     isRTL: boolean;
 }
 
-const calcActualValue = (value: number, size: number) => (value / 100) * size;
+// the region colours are "rgba(r, g, b, a)": same colour, other strength
+const withAlpha = (color: string, alpha: number) => color.replace(/[\d.]+\)$/, `${alpha})`);
 
-const calcRectCenter = (pos1: number, pos2: number) => (pos1 + pos2) * 0.5 + pos1 * 0.5;
+const calcActualValue = (value: number, size: number) => (value / 100) * size;
 
 export class ReaderTapZoneService {
     private static layout: TapZoneLayouts | null = null;
@@ -108,42 +109,54 @@ export class ReaderTapZoneService {
         fontStyle: CSSProperties,
         regions: TapZoneRegion[],
     ): void {
+        const gap = 4;
+        const radius = 18;
+
+        /* oxlint-disable no-param-reassign */
         regions.forEach(({ type, rect: [rectX, rectY, rectWidth, rectHeight] }) => {
             const { text: translation, color } = TAP_ZONE_REGION_TYPE_DATA[type];
-            const text = t(translation);
+            const label = t(translation);
+            const arrow = {
+                [TapZoneRegionType.PREVIOUS]: '‹  ',
+                [TapZoneRegionType.NEXT]: '',
+                [TapZoneRegionType.MENU]: '',
+            };
+            const text = `${arrow[type]}${label}${type === TapZoneRegionType.NEXT ? '  ›' : ''}`;
 
-            const x = calcActualValue(rectX, canvasWidth);
-            const y = calcActualValue(rectY, canvasHeight);
-            const width = calcActualValue(rectWidth, canvasWidth);
-            const height = calcActualValue(rectHeight, canvasHeight);
-            const rectCenterX = calcRectCenter(x, width);
-            const rectCenterY = calcRectCenter(y, height);
+            const x = calcActualValue(rectX, canvasWidth) + gap;
+            const y = calcActualValue(rectY, canvasHeight) + gap;
+            const width = calcActualValue(rectWidth, canvasWidth) - gap * 2;
+            const height = calcActualValue(rectHeight, canvasHeight) - gap * 2;
 
+            // a soft tinted tile with a thin edge in the same colour, instead of a flat opaque block
             context.beginPath();
-
-            /* oxlint-disable no-param-reassign */
-            context.rect(x, y, width, height);
-            context.fillStyle = color;
-            context.strokeStyle = color;
-            context.lineWidth = 0.1;
-
-            context.stroke();
+            context.roundRect(x, y, width, height, radius);
+            context.fillStyle = withAlpha(color, 0.26);
             context.fill();
+            context.lineWidth = 1.5;
+            context.strokeStyle =
+                type === TapZoneRegionType.MENU ? 'rgba(255, 255, 255, 0.35)' : withAlpha(color, 0.85);
+            context.stroke();
 
-            context.strokeStyle = 'black';
+            // the name sits on a small dark pill in the middle of the tile so it stays readable on any page
+            const fontSize = Math.round(Math.min(22, Math.max(14, Math.min(width, height) * 0.09)));
+            context.font = `600 ${fontSize}px ${fontStyle.fontFamily}`;
             context.textAlign = 'center';
             context.textBaseline = 'middle';
-            context.font = `${fontStyle.fontSize} ${fontStyle.fontFamily}`;
+            const centerX = x + width / 2;
+            const centerY = y + height / 2;
+            const pillWidth = context.measureText(text).width + fontSize * 1.6;
+            const pillHeight = fontSize * 2.1;
 
-            context.strokeStyle = 'black';
-            context.lineWidth = 3;
-            context.strokeText(text, rectCenterX, rectCenterY);
+            context.beginPath();
+            context.roundRect(centerX - pillWidth / 2, centerY - pillHeight / 2, pillWidth, pillHeight, pillHeight / 2);
+            context.fillStyle = 'rgba(0, 0, 0, 0.62)';
+            context.fill();
 
-            context.lineWidth = 1;
             context.fillStyle = 'white';
-            context.fillText(text, rectCenterX, rectCenterY);
-            /* oxlint-enable no-param-reassign */
+            context.fillText(text, centerX, centerY);
         });
+        /* oxlint-enable no-param-reassign */
     }
 
     static getOrCreateCanvas(

@@ -9,8 +9,11 @@
 import Stack from '@mui/material/Stack';
 import Button from '@mui/material/Button';
 import SettingsIcon from '@mui/icons-material/Settings';
-import { memo } from 'react';
+import GridViewIcon from '@mui/icons-material/GridView';
+import { memo, useState } from 'react';
 import { useLingui } from '@lingui/react/macro';
+import { TONAL_BUTTON_SX } from '@/features/reader/overlay/navigation/ReaderNavTonalButton.ts';
+import { ReaderPageThumbnails } from '@/features/reader/overlay/navigation/components/ReaderPageThumbnails.tsx';
 import { ReaderNavBarDesktopPageScale } from '@/features/reader/overlay/navigation/desktop/quick-settings/components/ReaderNavBarDesktopPageScale.tsx';
 import { ReaderNavBarDesktopReadingMode } from '@/features/reader/overlay/navigation/desktop/quick-settings/components/ReaderNavBarDesktopReadingMode.tsx';
 import { ReaderNavBarDesktopOffsetDoubleSpread } from '@/features/reader/overlay/navigation/desktop/quick-settings/components/ReaderNavBarDesktopOffsetDoubleSpread.tsx';
@@ -22,6 +25,7 @@ import { useReaderSettingsStore } from '@/features/reader/stores/ReaderStore.ts'
 
 const BaseReaderNavBarDesktopQuickSettings = ({ openSettings }: Pick<ReaderNavBarDesktopProps, 'openSettings'>) => {
     const { t } = useLingui();
+    const [isThumbnailsOpen, setIsThumbnailsOpen] = useState(false);
     const { readingMode, shouldOffsetDoubleSpreads, pageScaleMode, shouldStretchPage, readingDirection, autoScroll } =
         useReaderSettingsStore(
             'readingMode',
@@ -62,15 +66,20 @@ const BaseReaderNavBarDesktopQuickSettings = ({ openSettings }: Pick<ReaderNavBa
                 autoScroll={autoScroll}
                 setAutoScroll={(...args) => ReaderService.updateSetting('autoScroll', ...args)}
             />
-            <Button
-                onClick={() => openSettings()}
-                size="large"
-                sx={{ justifyContent: 'start', textTransform: 'none' }}
-                variant="contained"
-                startIcon={<SettingsIcon />}
-            >
-                {t`Settings`}
-            </Button>
+            <Stack sx={{ flexDirection: 'row', gap: 1, pt: 0.5 }}>
+                <Button
+                    onClick={() => setIsThumbnailsOpen(true)}
+                    size="large"
+                    sx={TONAL_BUTTON_SX}
+                    startIcon={<GridViewIcon />}
+                >
+                    {t`Pages`}
+                </Button>
+                <Button onClick={() => openSettings()} size="large" sx={TONAL_BUTTON_SX} startIcon={<SettingsIcon />}>
+                    {t`Settings`}
+                </Button>
+            </Stack>
+            <ReaderPageThumbnails open={isThumbnailsOpen} onClose={() => setIsThumbnailsOpen(false)} />
         </Stack>
     );
 };

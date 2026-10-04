@@ -8,6 +8,7 @@
 
 import IconButton from '@mui/material/IconButton';
 import SettingsIcon from '@mui/icons-material/Settings';
+import GridViewIcon from '@mui/icons-material/GridView';
 import Stack from '@mui/material/Stack';
 import AppSettingsAltIcon from '@mui/icons-material/AppSettingsAlt';
 import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
@@ -20,6 +21,7 @@ import { useLingui } from '@lingui/react/macro';
 import { CustomTooltip } from '@/base/components/CustomTooltip.tsx';
 import type { ReaderBottomBarMobileProps } from '@/features/reader/overlay/ReaderOverlay.types.ts';
 import { MobileReaderProgressBar } from '@/features/reader/overlay/progress-bar/mobile/MobileReaderProgressBar.tsx';
+import { ReaderPageThumbnails } from '@/features/reader/overlay/navigation/components/ReaderPageThumbnails.tsx';
 import { ReaderChapterList } from '@/features/reader/overlay/navigation/components/ReaderChapterList.tsx';
 import { ReaderBottomBarMobileQuickSettings } from '@/features/reader/overlay/navigation/mobile/quick-settings/ReaderBottomBarMobileQuickSettings.tsx';
 import { useResizeObserver } from '@/base/hooks/useResizeObserver.tsx';
@@ -38,6 +40,7 @@ const BaseReaderBottomBarMobile = ({
 
     const chapterListPopupState = usePopupState({ variant: 'dialog', popupId: 'reader-chapter-list-dialog' });
     const quickSettingsPopupState = usePopupState({ variant: 'dialog', popupId: 'reader-quick-settings-dialog' });
+    const [isThumbnailsOpen, setIsThumbnailsOpen] = useState(false);
     const scrollbar = useReaderScrollbarStore((state) => state);
 
     const [bottomBarRefHeight, setBottomBarRefHeight] = useState(0);
@@ -80,7 +83,7 @@ const BaseReaderBottomBarMobile = ({
                     >
                         <Stack
                             sx={{
-                                width: '50%',
+                                width: '66%',
                                 flexDirection: 'row',
                                 p: 2,
                                 gap: 1,
@@ -103,10 +106,16 @@ const BaseReaderBottomBarMobile = ({
                                     <SettingsIcon />
                                 </IconButton>
                             </CustomTooltip>
+                            <CustomTooltip title={t`Pages`}>
+                                <IconButton onClick={() => setIsThumbnailsOpen(true)} color="inherit">
+                                    <GridViewIcon />
+                                </IconButton>
+                            </CustomTooltip>
                         </Stack>
                     </Stack>
                 </Slide>
             </Stack>
+            <ReaderPageThumbnails open={isThumbnailsOpen} onClose={() => setIsThumbnailsOpen(false)} />
             {chapterListPopupState.isOpen && (
                 <Dialog {...bindDialog(chapterListPopupState)} fullWidth maxWidth="md" scroll="paper">
                     <DialogContent sx={{ p: 0, pb: 1 }}>
