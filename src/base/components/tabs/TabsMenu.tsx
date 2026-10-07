@@ -17,6 +17,19 @@ const StyledTabsMenu = styled(Tabs)(({ theme }) => ({
     borderBottomWidth: 2,
     borderStyle: 'solid',
     borderColor: theme.palette.divider,
+    position: 'relative',
+    // the scroll arrows float over the edges: a hidden arrow must not reserve space, so the first tab starts at the left
+    '& .MuiTabs-scrollButtons': {
+        position: 'absolute',
+        top: 0,
+        bottom: 0,
+        zIndex: 1,
+        width: 32,
+        backgroundColor: 'inherit',
+        '&:first-child': { left: 0 },
+        '&:last-child': { right: 0 },
+    },
+    '& .MuiTabs-flexContainer': { paddingInline: 8 },
 }));
 
 export const TabsMenu = ({ children, ...props }: TabsProps) => (

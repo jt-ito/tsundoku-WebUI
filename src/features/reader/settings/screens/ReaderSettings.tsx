@@ -36,6 +36,14 @@ export const ReaderSettings = ({ isOpen, close }: { isOpen: boolean; close: () =
             fullWidth
             onClose={close}
             hideBackdrop={activeTab === ReaderSettingTab.FILTER}
+            slotProps={{
+                paper: {
+                    sx: (theme) => ({
+                        // phones: every tab has the height of the General tab and scrolls inside it
+                        [theme.breakpoints.down('md')]: { height: 'min(690px, calc(100% - 64px))' },
+                    }),
+                },
+            }}
             sx={applyStyles(isTransparent, {
                 opacity: 0.75,
             })}

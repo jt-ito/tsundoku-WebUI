@@ -50,6 +50,14 @@ const segmentedSx = (theme: Theme) => ({
             'background-color 150ms ease, color 150ms ease, box-shadow 150ms ease, transform 100ms cubic-bezier(0.2, 0, 0, 1)',
         '&:active': { transform: 'scale(0.97)' },
     },
+    // phones: an even two column grid, a last odd option takes the whole row
+    [theme.breakpoints.down('md')]: {
+        display: 'grid',
+        gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
+        width: '100%',
+        '& .MuiButton-root': { justifyContent: 'center', lineHeight: 1.2 },
+        '& > :last-child:nth-child(odd)': { gridColumn: '1 / -1' },
+    },
     '& .MuiButton-outlined': {
         color: theme.palette.text.secondary,
         backgroundColor: 'transparent',
