@@ -55,7 +55,11 @@ const segmentedSx = (theme: Theme) => ({
         display: 'grid',
         gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
         width: '100%',
-        '& .MuiButton-root': { justifyContent: 'center', lineHeight: 1.2 },
+        '& .MuiButton-root': {
+            justifyContent: 'center',
+            lineHeight: 1.2,
+            borderColor: alpha(theme.palette.text.primary, 0.3),
+        },
         '& > :last-child:nth-child(odd)': { gridColumn: '1 / -1' },
     },
     '& .MuiButton-outlined': {

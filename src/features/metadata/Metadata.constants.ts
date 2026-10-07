@@ -177,6 +177,9 @@ export const APP_METADATA: Record<
     showDownloadBadge: {
         convert: convertToBoolean,
     },
+    showUnknownStatusBadge: {
+        convert: convertToBoolean,
+    },
     showUnreadBadge: {
         convert: convertToBoolean,
     },
@@ -478,6 +481,7 @@ export const GLOBAL_METADATA_KEYS: AppMetadataKeys[] = [
     // display
     'showDownloadBadge',
     'showUnreadBadge',
+    'showUnknownStatusBadge',
     'showTabSize',
     'showContinueReadingButton',
 

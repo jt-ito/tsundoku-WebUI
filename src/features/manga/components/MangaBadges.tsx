@@ -29,6 +29,9 @@ import { MANGA_STATUS_TO_COLOR, MANGA_STATUS_TO_TRANSLATION } from '@/features/m
 const BadgeContainer = styled('div')({
     display: 'flex',
     height: 'fit-content',
+    // a long label (e.g. "Publishing finished") shrinks with an ellipsis instead of wrapping out of the pill
+    maxWidth: '100%',
+    minWidth: 0,
     borderRadius: 9999,
     overflow: 'hidden',
     boxShadow: ELEVATION.sm,
@@ -59,6 +62,8 @@ const FrostedBadge = styled(Badge)({
     boxSizing: 'border-box',
     display: 'inline-flex',
     alignItems: 'center',
+    whiteSpace: 'nowrap',
+    flexShrink: 0,
 });
 
 // frosted pill with a small glowing dot in `--status-color`
@@ -74,6 +79,7 @@ const DotBadge = styled(FrostedBadge)({
         borderRadius: '50%',
         backgroundColor: 'var(--status-color)',
         boxShadow: '0 0 6px var(--status-color)',
+        flexShrink: 0,
     },
 });
 
@@ -108,7 +114,7 @@ export const MangaBadges = ({
     const isTouchDevice = MediaQuery.useIsTouchDevice();
 
     const {
-        settings: { showUnreadBadge, showDownloadBadge },
+        settings: { showUnreadBadge, showDownloadBadge, showUnknownStatusBadge },
     } = useMetadataServerSettings();
 
     const [isPeeking, setIsPeeking] = useState(false);
@@ -206,16 +212,21 @@ export const MangaBadges = ({
                         {downloadCount}
                     </DotBadge>
                 )}
-                {mode === 'default' && !!status && status !== MangaStatus.Unknown && (
+                {mode === 'default' && !!status && (showUnknownStatusBadge || status !== MangaStatus.Unknown) && (
                     <DotBadge
                         sx={(theme) => ({
+                            // the only badge that may shrink
+                            flexShrink: 1,
+                            minWidth: 0,
                             '--status-color':
                                 MANGA_STATUS_TO_COLOR[status] === 'default'
                                     ? theme.palette.text.secondary
                                     : theme.palette[MANGA_STATUS_TO_COLOR[status]].main,
                         })}
                     >
-                        {t(MANGA_STATUS_TO_TRANSLATION[status])}
+                        <span style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                            {t(MANGA_STATUS_TO_TRANSLATION[status])}
+                        </span>
                     </DotBadge>
                 )}
             </BadgeContainer>

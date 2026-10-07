@@ -21,6 +21,7 @@ export type MetadataLibrarySettings = {
     showContinueReadingButton: boolean;
     showDownloadBadge: boolean;
     showUnreadBadge: boolean;
+    showUnknownStatusBadge: boolean;
     gridLayout: GridLayout;
 };
 export type LibrarySortMode =

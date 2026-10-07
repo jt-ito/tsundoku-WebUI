@@ -4622,6 +4622,10 @@ msgstr "Unknown"
 msgid "Unknown source"
 msgstr "Unknown source"
 
+#: src/features/library/components/LibraryOptionsPanel.tsx
+msgid "Unknown status badges"
+msgstr "Unknown status badges"
+
 #: src/features/browse/sources/components/SourceCard.tsx
 msgid "Unpin source"
 msgstr "Unpin source"

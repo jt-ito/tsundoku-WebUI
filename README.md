@@ -1,4 +1,4 @@
-# tsundoku-WebUI
+<h1><img src="public/favicon.svg" alt="" width="40" align="top"> tsundoku-WebUI</h1>
 
 The web interface of [tsundoku](https://github.com/jt-ito/tsundoku), a self-hosted manga reader server.
 
