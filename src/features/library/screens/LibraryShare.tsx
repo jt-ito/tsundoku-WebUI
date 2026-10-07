@@ -384,6 +384,28 @@ export function LibraryShare() {
                             label={t`Only some categories`}
                         />
                     </RadioGroup>
+                    {scope === LibraryShareScope.Categories && (
+                        <Stack sx={{ pl: 4 }}>
+                            {shareableCategories.map((category) => (
+                                <FormControlLabel
+                                    key={category.id}
+                                    label={category.name}
+                                    control={
+                                        <Checkbox
+                                            checked={categoryIds.includes(category.id)}
+                                            onChange={(e) =>
+                                                setCategoryIds((ids) =>
+                                                    e.target.checked
+                                                        ? [...ids, category.id]
+                                                        : ids.filter((id) => id !== category.id),
+                                                )
+                                            }
+                                        />
+                                    }
+                                />
+                            ))}
+                        </Stack>
+                    )}
                     <Divider />
                     <RadioGroup value={synced ? 'sync' : 'once'} onChange={(e) => setSynced(e.target.value === 'sync')}>
                         <FormControlLabel value="once" control={<Radio />} label={t`Send as is`} />
@@ -404,25 +426,6 @@ export function LibraryShare() {
                             />
                         </>
                     )}
-                    {scope === LibraryShareScope.Categories &&
-                        shareableCategories.map((category) => (
-                            <FormControlLabel
-                                key={category.id}
-                                label={category.name}
-                                control={
-                                    <Checkbox
-                                        checked={categoryIds.includes(category.id)}
-                                        onChange={(e) =>
-                                            setCategoryIds((ids) =>
-                                                e.target.checked
-                                                    ? [...ids, category.id]
-                                                    : ids.filter((id) => id !== category.id),
-                                            )
-                                        }
-                                    />
-                                }
-                            />
-                        ))}
                     <Button variant="contained" disabled={!canSend} onClick={send}>
                         {t`Send request`}
                     </Button>

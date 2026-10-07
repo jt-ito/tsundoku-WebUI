@@ -190,6 +190,17 @@ export function LibrarySettings() {
                         onChange={(e) => setSettingValue('fuzzySearch', e.target.checked)}
                     />
                 </ListItem>
+                <ListItem>
+                    <ListItemText
+                        primary={t`Separate scroll buttons`}
+                        secondary={t`Show a button for the top and one for the bottom of the library, instead of one that switches`}
+                    />
+                    <Switch
+                        edge="end"
+                        checked={settings.splitScrollButtons}
+                        onChange={(e) => setSettingValue('splitScrollButtons', e.target.checked)}
+                    />
+                </ListItem>
             </List>
             <GlobalUpdateSettings
                 serverSettings={serverSettings.data!.settings}

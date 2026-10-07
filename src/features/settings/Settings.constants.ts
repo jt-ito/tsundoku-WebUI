@@ -54,6 +54,7 @@ export const SERVER_SETTINGS_METADATA_DEFAULT: MetadataServerSettings = {
     fuzzySearch: true,
     removeMangaFromCategories: false,
     showTabSize: false,
+    splitScrollButtons: false,
     showContinueReadingButton: false,
     showDownloadBadge: false,
     showUnreadBadge: false,

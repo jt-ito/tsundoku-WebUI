@@ -101,7 +101,9 @@ export function About() {
                                 updateCheckError={serverUpdateCheckError}
                                 checkForUpdate={checkForServerUpdate}
                                 downloadAsLink
-                                url={selectedServerChannelInfo?.url ?? ''}
+                                // a container is updated by pulling the new image, not by downloading a jar
+                                url={aboutServer.isDocker ? '' : (selectedServerChannelInfo?.url ?? '')}
+                                disableAction={aboutServer.isDocker}
                             />
                         }
                     />

@@ -3413,6 +3413,7 @@ export type GetAboutQuery = {
         buildType: string;
         discord: string;
         github: string;
+        isDocker: boolean;
         name: string;
         version: string;
         platformInfo: {

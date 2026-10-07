@@ -17,8 +17,10 @@ export const ButtonSelectInput = <Value extends string | number, MultiValue exte
     description,
     ...buttonSelectProps
 }: ComponentProps<typeof SelectButton<Value, MultiValue>> & { label: string; description?: string }) => (
-    <Stack>
-        <Typography>{label}</Typography>
+    <Stack sx={{ gap: 0.75 }}>
+        <Typography variant="body2" sx={{ fontWeight: 600 }}>
+            {label}
+        </Typography>
         {description && (
             <Typography variant="body2" color="textDisabled">
                 {description}

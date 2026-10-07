@@ -27,6 +27,8 @@ export type BaseVersionInfoProps = {
 export type LinkVersionInfoProps = {
     downloadAsLink: true;
     url: string;
+    /** the update cannot be downloaded here (Docker: pull the new image) */
+    disableAction?: boolean;
 };
 export type TriggerVersionInfoProps = {
     triggerUpdate: () => void;
@@ -103,8 +105,10 @@ export const VersionInfo = ({
     progress,
     downloadAsLink,
     url,
+    disableAction,
 }: VersionInfoProps) => {
     const isUpdateInProgress = updateState === UpdateState.Downloading;
+    const isActionDisabled = !!disableAction && isUpdateAvailable;
 
     const onClick = () => {
         if (isUpdateInProgress) {
@@ -146,6 +150,7 @@ export const VersionInfo = ({
                     downloadAsLink,
                 )}
                 onClick={onClick}
+                disabled={isActionDisabled}
                 {...(!!url && isUpdateAvailable
                     ? {
                           href: url,
@@ -153,13 +158,15 @@ export const VersionInfo = ({
                       }
                     : undefined)}
             >
-                {getUpdateCheckButtonText(
-                    isCheckingForUpdate,
-                    isUpdateAvailable,
-                    updateCheckError,
-                    updateState,
-                    progress,
-                )}
+                {isActionDisabled
+                    ? t`Update available: pull the new Docker image`
+                    : getUpdateCheckButtonText(
+                          isCheckingForUpdate,
+                          isUpdateAvailable,
+                          updateCheckError,
+                          updateState,
+                          progress,
+                      )}
             </Button>
         </Stack>
     );

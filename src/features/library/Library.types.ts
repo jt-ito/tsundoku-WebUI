@@ -17,6 +17,7 @@ export type MetadataLibrarySettings = {
     fuzzySearch: boolean;
     removeMangaFromCategories: boolean;
     showTabSize: boolean;
+    splitScrollButtons: boolean;
     showContinueReadingButton: boolean;
     showDownloadBadge: boolean;
     showUnreadBadge: boolean;

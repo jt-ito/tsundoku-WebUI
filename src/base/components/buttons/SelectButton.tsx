@@ -21,6 +21,47 @@ import { assertIsDefined } from '@/base/Asserts.ts';
 import RestartAltIcon from '@mui/icons-material/RestartAlt';
 import { useElementSize } from '@mantine/hooks';
 import { MUIUtil } from '@/lib/mui/MUI.util.ts';
+import type { Theme } from '@mui/material/styles';
+import { alpha } from '@mui/material/styles';
+
+/**
+ * A segmented control: the options sit in one soft track and the selected one is a raised, filled pill. Only colors
+ * from the theme are used, so it follows the user's theme (light/dark and accent).
+ */
+const segmentedSx = (theme: Theme) => ({
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    alignItems: 'center',
+    gap: '4px',
+    padding: '4px',
+    width: 'fit-content',
+    maxWidth: '100%',
+    borderRadius: '12px',
+    backgroundColor: alpha(theme.palette.text.primary, 0.06),
+    '& .MuiButton-root': {
+        minHeight: 34,
+        padding: '4px 14px',
+        borderRadius: '9px',
+        border: '1px solid transparent',
+        fontWeight: 600,
+        textTransform: 'none',
+        boxShadow: 'none',
+        transition:
+            'background-color 150ms ease, color 150ms ease, box-shadow 150ms ease, transform 100ms cubic-bezier(0.2, 0, 0, 1)',
+        '&:active': { transform: 'scale(0.97)' },
+    },
+    '& .MuiButton-outlined': {
+        color: theme.palette.text.secondary,
+        backgroundColor: 'transparent',
+        '&:hover': { backgroundColor: alpha(theme.palette.text.primary, 0.08), color: theme.palette.text.primary },
+    },
+    '& .MuiButton-contained': {
+        color: theme.palette.primary.contrastText,
+        backgroundColor: theme.palette.primary.main,
+        boxShadow: `0 1px 3px ${alpha(theme.palette.common.black, 0.35)}, inset 0 1px 0 ${alpha(theme.palette.common.white, 0.18)}`,
+        '&:hover': { backgroundColor: theme.palette.primary.main, filter: 'brightness(1.06)' },
+    },
+});
 
 export interface SelectButtonBaseProps<Value extends string | number, MultiValue extends Value | Value[] = Value> {
     value: MultiValue;
@@ -66,11 +107,7 @@ const SelectButtonBase = <Value extends string | number, MultiValue extends Valu
     const { t } = useLingui();
 
     return (
-        <Stack
-            {...slotProps?.stack}
-            ref={ref}
-            sx={MUIUtil.mergeSx({ flexDirection: 'row', flexWrap: 'wrap', gap: 1 }, slotProps?.stack?.sx)}
-        >
+        <Stack {...slotProps?.stack} ref={ref} sx={MUIUtil.mergeSx(segmentedSx, slotProps?.stack?.sx)}>
             {isDefaultable && (
                 <CustomTooltip title={slotProps?.defaultButton?.hideText ? t`Default` : null}>
                     <Button
@@ -206,6 +243,7 @@ const SelectButtonCollapsible = <Value extends string | number, MultiValue exten
                     stack: {
                         sx: {
                             flexGrow: 1,
+                            width: '100%',
                         },
                     },
                     defaultButton: {

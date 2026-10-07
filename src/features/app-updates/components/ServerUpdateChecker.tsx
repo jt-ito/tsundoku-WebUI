@@ -16,14 +16,11 @@ import Button from '@mui/material/Button';
 import { useLingui } from '@lingui/react/macro';
 import { requestManager } from '@/lib/requests/RequestManager.ts';
 import { useUpdateChecker } from '@/features/app-updates/hooks/useUpdateChecker.tsx';
-import { VersionUpdateInfoDialog } from '@/features/app-updates/components/VersionUpdateInfoDialog.tsx';
 import {
     updateMetadataServerSettings,
     useMetadataServerSettings,
 } from '@/features/settings/services/ServerSettingsMetadata.ts';
-import { AppRoutes } from '@/base/AppRoute.constants.ts';
 import { STABLE_EMPTY_OBJECT } from '@/base/Base.constants.ts';
-import { SubpathUtil } from '@/lib/utils/SubpathUtil.ts';
 
 const disabledUpdateCheck = () => Promise.resolve();
 
@@ -54,9 +51,9 @@ export const ServerUpdateChecker = () => {
         (channel) => channel.channel === aboutServer?.buildType,
     );
     const version = aboutServer ? aboutServer.version : undefined;
-    const isServerUpdateAvailable = !!selectedServerChannelInfo?.tag && selectedServerChannelInfo.tag !== version;
 
-    const updateChecker = useUpdateChecker(
+    // the periodic check; the result is shown by the sidebar's SidebarVersionButton
+    useUpdateChecker(
         'server',
         serverInformAvailableUpdate ? checkForUpdate : disabledUpdateCheck,
         selectedServerChannelInfo?.tag,
@@ -96,30 +93,6 @@ export const ServerUpdateChecker = () => {
 
     if (serverUpdateCheckError) {
         return null;
-    }
-
-    if (isServerUpdateAvailable) {
-        if (!serverInformAvailableUpdate) {
-            return null;
-        }
-
-        const isAboutPage = SubpathUtil.getPathname() === AppRoutes.about.path;
-        if (isAboutPage) {
-            return null;
-        }
-
-        if (!updateChecker.handleUpdate) {
-            return null;
-        }
-
-        return (
-            <VersionUpdateInfoDialog
-                info={t`Server version ${selectedServerChannelInfo.tag} (${selectedServerChannelInfo.channel}) available for download`}
-                actionTitle={t`Download`}
-                actionUrl={selectedServerChannelInfo.url}
-                updateCheckerProps={['server', checkForUpdate, selectedServerChannelInfo?.tag]}
-            />
-        );
     }
 
     if (!open) {

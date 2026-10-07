@@ -19,6 +19,7 @@ export type AboutServerPayload = {
     buildType: Scalars['String']['output'];
     discord: Scalars['String']['output'];
     github: Scalars['String']['output'];
+    isDocker: Scalars['Boolean']['output'];
     name: Scalars['String']['output'];
     platformInfo: PlatformInfo;
     /** @deprecated The version includes the revision as the patch number */

@@ -4,6 +4,7 @@ export type AboutServerPayloadKeySpecifier = (
     | 'buildType'
     | 'discord'
     | 'github'
+    | 'isDocker'
     | 'name'
     | 'platformInfo'
     | 'revision'
@@ -15,6 +16,7 @@ export type AboutServerPayloadFieldPolicy = {
     buildType?: FieldPolicy<any> | FieldReadFunction<any>;
     discord?: FieldPolicy<any> | FieldReadFunction<any>;
     github?: FieldPolicy<any> | FieldReadFunction<any>;
+    isDocker?: FieldPolicy<any> | FieldReadFunction<any>;
     name?: FieldPolicy<any> | FieldReadFunction<any>;
     platformInfo?: FieldPolicy<any> | FieldReadFunction<any>;
     revision?: FieldPolicy<any> | FieldReadFunction<any>;

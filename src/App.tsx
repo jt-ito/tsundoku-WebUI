@@ -38,6 +38,7 @@ import { MigrationFABIndicator } from '@/features/migration/components/Migration
 import { MigrationManager } from '@/features/migration/MigrationManager.ts';
 import { useReloadOnNewVersion } from '@/lib/utils/ReloadOnNewVersion.ts';
 import { usePinchZoomOnlyInReader } from '@/lib/utils/PinchZoom.ts';
+import { useBlurInputOnScroll } from '@/lib/utils/BlurInputOnScroll.ts';
 import { SplashScreen } from '@/features/authentication/components/SplashScreen.tsx';
 import { d } from 'koration';
 import { OffsetContainer } from '@/base/OffsetComponent.tsx';
@@ -221,6 +222,7 @@ const ReactRouterSetter = () => {
 
 const PinchZoomGuard = () => {
     usePinchZoomOnlyInReader();
+    useBlurInputOnScroll();
 
     return null;
 };

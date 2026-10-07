@@ -117,6 +117,9 @@ export const APP_METADATA: Record<
     showTabSize: {
         convert: convertToBoolean,
     },
+    splitScrollButtons: {
+        convert: convertToBoolean,
+    },
     devices: {
         convert: convertToObject<string[]>,
     },
@@ -456,6 +459,7 @@ export const GLOBAL_METADATA_KEYS: AppMetadataKeys[] = [
     'fuzzySearch',
     'removeMangaFromCategories',
     'showTabSize',
+    'splitScrollButtons',
 
     // library category options
     // filter

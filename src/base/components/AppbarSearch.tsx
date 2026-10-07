@@ -280,6 +280,8 @@ export const AppbarSearch: React.FunctionComponent<IProps> = (props) => {
                     },
                     popper: {
                         placement: 'bottom-start',
+                        // the field sits in the fixed app bar: an absolutely positioned popper would scroll away with the page
+                        popperOptions: { strategy: 'fixed' },
                         sx: {
                             [theme.breakpoints.down('md')]: {
                                 width: `calc(100vw - ${navBarWidth}px - ${scrollbarYSize}px) !important`,

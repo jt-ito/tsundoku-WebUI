@@ -23,6 +23,7 @@ import { useGetOptionForDirection } from '@/features/theme/services/ThemeCreator
 import { useNavBarContext } from '@/features/navigation-bar/NavbarContext.tsx';
 import { useResizeObserver } from '@/base/hooks/useResizeObserver.tsx';
 import type { NavbarItem } from '@/features/navigation-bar/NavigationBar.types.ts';
+import { SidebarVersionButton } from '@/features/app-updates/components/SidebarVersionButton.tsx';
 import { UserProfileCard } from '@/features/authentication/components/UserProfileCard.tsx';
 import { NavigationBarItem } from '@/features/navigation-bar/components/NavigationBarItem.tsx';
 
@@ -189,6 +190,7 @@ export const DesktopSideBar = ({ navBarItems }: { navBarItems: NavbarItem[] }) =
                     ))}
                 </List>
             </Box>
+            <SidebarVersionButton isCollapsed={isCollapsed} />
             <UserProfileCard isCollapsed={isCollapsed} />
         </Drawer>
     );

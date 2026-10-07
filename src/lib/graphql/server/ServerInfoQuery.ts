@@ -17,6 +17,7 @@ export const GET_ABOUT = gql`
             buildType
             discord
             github
+            isDocker
             name
             version
             platformInfo {

@@ -29,6 +29,7 @@ import { useAppTitle } from '@/features/navigation-bar/hooks/useAppTitle.ts';
 import { STABLE_EMPTY_ARRAY } from '@/base/Base.constants.ts';
 import { requestManager } from '@/lib/requests/RequestManager.ts';
 import { AuthManager } from '@/features/authentication/AuthManager.ts';
+import { SidebarVersionButton } from '@/features/app-updates/components/SidebarVersionButton.tsx';
 import { UserAccountsDialog } from '@/features/authentication/components/UserAccountsDialog.tsx';
 
 export const More = () => {
@@ -90,15 +91,18 @@ export const More = () => {
             {Object.entries(finalHiddenNavBarItemsByGroup).map(([group, items], index, list) => (
                 <Fragment key={group}>
                     {items.map((item) => (
-                        <ListItemLink key={item.path} to={item.path}>
-                            <ListItemIcon>
-                                <item.IconComponent />
-                            </ListItemIcon>
-                            <ListItemText
-                                primary={t(item.moreTitle ?? item.title)}
-                                secondary={item.useBadge?.().title}
-                            />
-                        </ListItemLink>
+                        <Fragment key={item.path}>
+                            <ListItemLink to={item.path}>
+                                <ListItemIcon>
+                                    <item.IconComponent />
+                                </ListItemIcon>
+                                <ListItemText
+                                    primary={t(item.moreTitle ?? item.title)}
+                                    secondary={item.useBadge?.().title}
+                                />
+                            </ListItemLink>
+                            {item.path === AppRoutes.about.path && <SidebarVersionButton inline />}
+                        </Fragment>
                     ))}
                     {index !== list.length - 1 && <Divider />}
                 </Fragment>

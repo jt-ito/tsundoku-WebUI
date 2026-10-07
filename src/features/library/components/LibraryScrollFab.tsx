@@ -10,10 +10,15 @@ import KeyboardArrowDown from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUp from '@mui/icons-material/KeyboardArrowUp';
 import { useLingui } from '@lingui/react/macro';
 import { useEffect, useState } from 'react';
+import type { Theme } from '@mui/material/styles';
 import { DEFAULT_FAB_STYLE, StyledFab } from '@/base/components/buttons/StyledFab.tsx';
 import { useNavBarContext } from '@/features/navigation-bar/NavbarContext.tsx';
+import { useMetadataServerSettings } from '@/features/settings/services/ServerSettingsMetadata.ts';
 
 type ScrollTarget = 'top' | 'bottom' | null;
+
+const SMALL_FAB_SIZE = 40;
+const SPLIT_FAB_GAP = 8;
 
 const getTarget = (): ScrollTarget => {
     const max = document.documentElement.scrollHeight - window.innerHeight;
@@ -35,10 +40,20 @@ const scrollTo = (target: 'top' | 'bottom') => {
 export const LibraryScrollFab = ({ contentKey, isRaised }: { contentKey: unknown; isRaised?: boolean }) => {
     const { t } = useLingui();
     const { bottomBarHeight } = useNavBarContext();
+    const {
+        settings: { splitScrollButtons },
+    } = useMetadataServerSettings();
     const [target, setTarget] = useState<ScrollTarget>(null);
+    const [position, setPosition] = useState({ atTop: true, atBottom: false });
 
     useEffect(() => {
-        const update = () => setTarget(getTarget());
+        const update = () => {
+            setTarget(getTarget());
+            const max = document.documentElement.scrollHeight - window.innerHeight;
+            const atTop = window.scrollY <= 1;
+            const atBottom = window.scrollY >= max - 1;
+            setPosition((prev) => (prev.atTop === atTop && prev.atBottom === atBottom ? prev : { atTop, atBottom }));
+        };
         update();
         // re-check after the grid has laid out for the new category/filter
         const timeout = setTimeout(update, 500);
@@ -53,6 +68,48 @@ export const LibraryScrollFab = ({ contentKey, isRaised }: { contentKey: unknown
 
     if (!target) {
         return null;
+    }
+
+    if (splitScrollButtons) {
+        const bottom = (offset: number) =>
+            `calc(${bottomBarHeight}px + env(safe-area-inset-bottom) + 16px + ${offset}px${isRaised ? ` + ${DEFAULT_FAB_STYLE.height} + 16px` : ''})`;
+        const desktopBottom = (offset: number) =>
+            `calc(${DEFAULT_FAB_STYLE.bottom} + ${offset}px${isRaised ? ` + ${DEFAULT_FAB_STYLE.height} + 16px` : ''})`;
+        const splitSx = (offset: number) => (theme: Theme) => ({
+            bottom: desktopBottom(offset),
+            // lined up with the 48px FABs
+            right: `calc(${DEFAULT_FAB_STYLE.right} + 4px)`,
+            zIndex: 1,
+            transition: 'transform 0.15s cubic-bezier(0.23, 1, 0.32, 1), opacity 0.15s ease',
+            '&:active': { transform: 'scale(0.96)' },
+            '&.Mui-disabled': { opacity: 0.35 },
+            [theme.breakpoints.down('md')]: { bottom: bottom(offset) },
+        });
+
+        return (
+            <>
+                <StyledFab
+                    size="small"
+                    color="primary"
+                    aria-label={t`Scroll to top`}
+                    disabled={position.atTop}
+                    onClick={() => scrollTo('top')}
+                    sx={splitSx(SMALL_FAB_SIZE + SPLIT_FAB_GAP)}
+                >
+                    <KeyboardArrowUp />
+                </StyledFab>
+                <StyledFab
+                    size="small"
+                    color="primary"
+                    aria-label={t`Scroll to bottom`}
+                    disabled={position.atBottom}
+                    onClick={() => scrollTo('bottom')}
+                    sx={splitSx(0)}
+                >
+                    <KeyboardArrowDown />
+                </StyledFab>
+            </>
+        );
     }
 
     return (

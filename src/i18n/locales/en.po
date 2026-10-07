@@ -1753,7 +1753,6 @@ msgstr "Double page"
 msgid "Doujinshi"
 msgstr "Doujinshi"
 
-#: src/features/app-updates/components/ServerUpdateChecker.tsx
 #: src/features/chapter/Chapter.constants.ts
 #: src/features/chapter/components/buttons/ChapterDownloadButton.tsx
 #: src/features/chapter/components/ChaptersToolbarMenu.tsx
@@ -3390,6 +3389,14 @@ msgstr "Prompt"
 msgid "Publishing finished"
 msgstr "Publishing finished"
 
+#: src/features/app-updates/components/SidebarVersionButton.tsx
+msgid "Pull {latest}"
+msgstr "Pull {latest}"
+
+#: src/features/app-updates/components/SidebarVersionButton.tsx
+msgid "pull the new Docker image"
+msgstr "pull the new Docker image"
+
 #: src/features/settings/screens/Appearance.tsx
 msgid "Pure black dark mode"
 msgstr "Pure black dark mode"
@@ -3818,6 +3825,10 @@ msgstr "Send your library or some categories to another account"
 msgid "Sent {0} manga, received {1} manga"
 msgstr "Sent {0} manga, received {1} manga"
 
+#: src/features/library/screens/LibrarySettings.tsx
+msgid "Separate scroll buttons"
+msgstr "Separate scroll buttons"
+
 #: src/features/reader/filters/settings/components/ReaderSettingSepia.tsx
 msgid "Sepia"
 msgstr "Sepia"
@@ -3848,12 +3859,6 @@ msgstr "Server settings"
 #: src/features/settings/screens/About.tsx
 msgid "Server version"
 msgstr "Server version"
-
-#. placeholder {0}: selectedServerChannelInfo.tag
-#. placeholder {1}: selectedServerChannelInfo.channel
-#: src/features/app-updates/components/ServerUpdateChecker.tsx
-msgid "Server version {0} ({1}) available for download"
-msgstr "Server version {0} ({1}) available for download"
 
 #. placeholder {0}: aboutServer?.buildType
 #: src/features/app-updates/components/ServerUpdateChecker.tsx
@@ -3908,6 +3913,10 @@ msgstr "Share with another account"
 #: src/features/settings/components/DebugInformation.tsx
 msgid "Show"
 msgstr "Show"
+
+#: src/features/library/screens/LibrarySettings.tsx
+msgid "Show a button for the top and one for the bottom of the library, instead of one that switches"
+msgstr "Show a button for the top and one for the bottom of the library, instead of one that switches"
 
 #: src/features/library/screens/LibrarySettings.tsx
 msgid "Show all duplicated entries in your library"
@@ -4644,10 +4653,15 @@ msgstr "Update"
 msgid "Update all"
 msgstr "Update all"
 
+#: src/features/app-updates/components/SidebarVersionButton.tsx
 #: src/features/app-updates/components/VersionInfo.tsx
 #: src/features/app-updates/components/VersionUpdateInfoDialog.tsx
 msgid "Update available"
 msgstr "Update available"
+
+#: src/features/app-updates/components/VersionInfo.tsx
+msgid "Update available: pull the new Docker image"
+msgstr "Update available: pull the new Docker image"
 
 #: src/features/updates/components/UpdateChecker.tsx
 msgid "Update category"
@@ -4748,6 +4762,11 @@ msgstr "Veronica"
 #: src/features/extension/info/components/Meta.tsx
 msgid "Version"
 msgstr "Version"
+
+#. placeholder {0}: about.version
+#: src/features/app-updates/components/SidebarVersionButton.tsx
+msgid "Version {0}"
+msgstr "Version {0}"
 
 #: src/features/reader/settings/layout/components/ReaderSettingTapZoneInvertMode.tsx
 msgid "Vertical"

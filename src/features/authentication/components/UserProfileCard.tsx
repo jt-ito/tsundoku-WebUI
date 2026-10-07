@@ -43,7 +43,7 @@ export const UserProfileCard = ({ isCollapsed }: { isCollapsed: boolean }) => {
                 onClick={() => setIsOpen(true)}
                 sx={(theme) => ({
                     m: 1,
-                    mt: 'auto',
+                    mt: 0.5,
                     p: isCollapsed ? 1 : '8px 10px',
                     gap: 1.25,
                     justifyContent: isCollapsed ? 'center' : 'flex-start',
