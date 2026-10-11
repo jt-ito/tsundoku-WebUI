@@ -25,7 +25,7 @@ import type { NavbarItem } from '@/features/navigation-bar/NavigationBar.types.t
 import { NavBarItemMoreGroup } from '@/features/navigation-bar/NavigationBar.types.ts';
 import { AppRoutes } from '@/base/AppRoute.constants.ts';
 import { requestManager } from '@/lib/requests/RequestManager.ts';
-import { STABLE_EMPTY_ARRAY } from '@/base/Base.constants.ts';
+import { useExtensionUpdateCount } from '@/features/browse/extensions/hooks/useExtensionUpdateCount.ts';
 import { DownloaderState } from '@/lib/graphql/generated/graphql-base.types.ts';
 
 type RestrictedNavBarItem<Show extends NavbarItem['show']> = Omit<NavbarItem, 'show'> & { show: Show };
@@ -63,12 +63,7 @@ const NAVIGATION_BAR_BASE_ITEMS = [
         show: 'both',
         moreGroup: NavBarItemMoreGroup.GENERAL,
         useBadge: () => {
-            const { data } = requestManager.useGetExtensionList({ fetchPolicy: 'cache-only' });
-
-            const extensions = data?.extensions.nodes ?? STABLE_EMPTY_ARRAY;
-            const availableUpdates = extensions.filter(
-                (extension) => extension.hasUpdate && !extension.isObsolete,
-            ).length;
+            const availableUpdates = useExtensionUpdateCount();
 
             if (!availableUpdates) {
                 return {

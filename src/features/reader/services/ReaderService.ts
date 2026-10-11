@@ -256,6 +256,9 @@ export class ReaderService {
                                 (patch.isRead !== undefined && patch.isRead !== chapterUpToDateData.isRead) ||
                                 (patch.lastPageRead !== undefined &&
                                     patch.lastPageRead !== chapterUpToDateData.lastPageRead) ||
+                                (patch.lastPageOffset != null &&
+                                    Math.abs(patch.lastPageOffset - (chapterUpToDateData.lastPageOffset ?? 0)) >
+                                        0.005) ||
                                 (patch.isBookmarked !== undefined &&
                                     patch.isBookmarked !== chapterUpToDateData.isBookmarked)
                             );

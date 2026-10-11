@@ -120,6 +120,9 @@ export const APP_METADATA: Record<
     splitScrollButtons: {
         convert: convertToBoolean,
     },
+    swipeBetweenCategories: {
+        convert: convertToBoolean,
+    },
     devices: {
         convert: convertToObject<string[]>,
     },
@@ -463,6 +466,7 @@ export const GLOBAL_METADATA_KEYS: AppMetadataKeys[] = [
     'removeMangaFromCategories',
     'showTabSize',
     'splitScrollButtons',
+    'swipeBetweenCategories',
 
     // library category options
     // filter

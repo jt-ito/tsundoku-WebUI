@@ -52,6 +52,7 @@ import { applyStyles } from '@/base/utils/ApplyStyles.ts';
 import { CustomIconButton } from '@/base/components/buttons/CustomIconButton.tsx';
 import { Sources } from '@/features/source/services/Sources.ts';
 import type { SourceIdInfo } from '@/features/source/Source.types.ts';
+import { SourceContentType } from '@/features/source/Source.types.ts';
 import { Thumbnail } from '@/features/manga/components/details/Thumbnail.tsx';
 import { DescriptionGenre } from '@/features/manga/components/details/DescriptionGenre.tsx';
 import { SearchLink } from '@/features/manga/components/details/SearchLink.tsx';
@@ -291,7 +292,27 @@ export const MangaDetails = ({
                             />
                         )}
                         <Metadata title={t`Status`} value={t(MANGA_STATUS_TO_TRANSLATION[manga.status])} />
-                        <Metadata title={t`Source`} value={getSourceName(manga.source)} />
+                        <Metadata
+                            title={t`Source`}
+                            value={
+                                manga.source ? (
+                                    // opens the source to browse its other series
+                                    <Link
+                                        component={RouterLink}
+                                        to={AppRoutes.sources.children.browse.path(manga.source.id)}
+                                        state={AppRoutes.sources.children.browse.state({
+                                            contentType: SourceContentType.POPULAR,
+                                            clearCache: true,
+                                        })}
+                                        sx={{ textDecoration: 'none', color: 'inherit' }}
+                                    >
+                                        {getSourceName(manga.source)}
+                                    </Link>
+                                ) : (
+                                    getSourceName(manga.source)
+                                )
+                            }
+                        />
                     </MetadataContainer>
                 </ThumbnailMetadataWrapper>
                 <MangaButtonsContainer>

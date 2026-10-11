@@ -20,6 +20,7 @@ import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import { useLingui } from '@lingui/react/macro';
 import { CustomTooltip } from '@/base/components/CustomTooltip.tsx';
+import { AuthManager } from '@/features/authentication/AuthManager.ts';
 
 const OPEN_WEBVIEW_EVENT = 'suwayomi:open-webview';
 
@@ -31,6 +32,20 @@ export const openInAppWebView = (url: string) =>
     window.dispatchEvent(new CustomEvent(OPEN_WEBVIEW_EVENT, { detail: url }));
 
 const isWebViewLink = (link: HTMLAnchorElement) => !!link.href && link.pathname.endsWith('/webview');
+
+// the WebView page logs in by itself unless it is given the token of the current session ("?token=")
+const withSessionToken = (webViewUrl: string): string => {
+    const token = AuthManager.getAccessToken();
+    if (!token) {
+        return webViewUrl;
+    }
+
+    const hashIndex = webViewUrl.indexOf('#');
+    const base = hashIndex === -1 ? webViewUrl : webViewUrl.slice(0, hashIndex);
+    const hash = hashIndex === -1 ? '' : webViewUrl.slice(hashIndex);
+
+    return `${base}${base.includes('?') ? '&' : '?'}token=${encodeURIComponent(token)}${hash}`;
+};
 
 // "<server>/webview#<target url>" => "hostname/path" of the target url
 const getDisplayUrl = (webViewUrl: string): string => {
@@ -111,13 +126,15 @@ export const WebViewModal = () => {
                               width: 'min(1200px, 94vw)',
                               height: 'min(850px, 88vh)',
                               overflow: 'hidden',
-                              // phones: the shape of the screen of a current iPhone (19.5:9, corner radius about 11% of
-                              // the width), as large as the viewport allows
+                              // phones: nearly the full width and the room between the status bar and the home indicator
                               [theme.breakpoints.down('sm')]: {
-                                  '--phone-width': 'min(94vw, calc(94dvh * 9 / 19.5))',
-                                  width: 'var(--phone-width)',
-                                  height: 'calc(var(--phone-width) * 19.5 / 9)',
-                                  borderRadius: 'calc(var(--phone-width) * 0.11)',
+                                  width: '96vw',
+                                  height: 'calc(100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 28px)',
+                                  maxHeight: 'none',
+                                  margin: 0,
+                                  marginTop: 'calc(env(safe-area-inset-top) + 14px)',
+                                  marginBottom: 'calc(env(safe-area-inset-bottom) + 14px)',
+                                  borderRadius: '28px',
                               },
                           },
                 },
@@ -174,7 +191,7 @@ export const WebViewModal = () => {
                     <iframe
                         key={reloadKey}
                         title={t`WebView`}
-                        src={url}
+                        src={withSessionToken(url)}
                         onLoad={applyTheme}
                         allow="clipboard-read; clipboard-write"
                         style={{ flexGrow: 1, width: '100%', border: 'none' }}

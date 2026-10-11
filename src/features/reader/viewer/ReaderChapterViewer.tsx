@@ -23,6 +23,7 @@ import type {
 import { ReaderTransitionPageMode, ReadingDirection, ReadingMode } from '@/features/reader/Reader.types.ts';
 import { getDoublePageModePages } from '@/features/reader/viewer/pager/ReaderPager.utils.tsx';
 import type { ReaderControls } from '@/features/reader/services/ReaderControls.ts';
+import { ReaderScrollOffset } from '@/features/reader/services/ReaderScrollOffset.ts';
 import {
     getPagerForReadingMode,
     isContinuousReadingMode,
@@ -65,6 +66,7 @@ const BaseReaderChapterViewer = ({
     isPreviousChapterVisible,
     isNextChapterVisible,
     lastPageRead,
+    lastPageOffset,
     isInitialChapter,
     isCurrentChapter,
     isPreviousChapter,
@@ -96,6 +98,7 @@ const BaseReaderChapterViewer = ({
         isPreviousChapterVisible: boolean;
         isNextChapterVisible: boolean;
         lastPageRead: number;
+        lastPageOffset: number;
         isInitialChapter: boolean;
         isCurrentChapter: boolean;
         isPreviousChapter: boolean;
@@ -229,6 +232,13 @@ const BaseReaderChapterViewer = ({
         doFetchPages();
     }, [chapterId]);
 
+    // pages change their height while they load: keep the resumed spot in view until the reader scrolls on its own
+    useEffect(() => {
+        if (isCurrentChapter) {
+            ReaderScrollOffset.reapplyPendingResume(chapterId, globalImageRefs.current, scrollElement);
+        }
+    }, [pageLoadStates]);
+
     useResizeObserver(
         ref,
         useCallback(
@@ -259,6 +269,8 @@ const BaseReaderChapterViewer = ({
         pagesResponse,
         resumeMode,
         lastPageRead,
+        chapterId,
+        lastPageOffset,
         actualPages,
         pageLoadStates,
         pagesToSpreadState,

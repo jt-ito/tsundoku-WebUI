@@ -153,6 +153,7 @@ export type ChapterTypeKeySpecifier = (
     | 'isBookmarked'
     | 'isDownloaded'
     | 'isRead'
+    | 'lastPageOffset'
     | 'lastPageRead'
     | 'lastReadAt'
     | 'manga'
@@ -174,6 +175,7 @@ export type ChapterTypeFieldPolicy = {
     isBookmarked?: FieldPolicy<any> | FieldReadFunction<any>;
     isDownloaded?: FieldPolicy<any> | FieldReadFunction<any>;
     isRead?: FieldPolicy<any> | FieldReadFunction<any>;
+    lastPageOffset?: FieldPolicy<any> | FieldReadFunction<any>;
     lastPageRead?: FieldPolicy<any> | FieldReadFunction<any>;
     lastReadAt?: FieldPolicy<any> | FieldReadFunction<any>;
     manga?: FieldPolicy<any> | FieldReadFunction<any>;

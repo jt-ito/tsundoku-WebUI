@@ -81,7 +81,7 @@ export const LibraryToolbarMenu = ({
                     <ShuffleIcon />
                 </IconButton>
             </CustomTooltip>
-            <CustomTooltip title={t`Settings`}>
+            <CustomTooltip title={t`Filter/Sort`}>
                 <IconButton onClick={() => setOpen(!open)} color={active ? 'warning' : 'inherit'}>
                     <FilterList />
                 </IconButton>

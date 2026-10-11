@@ -367,6 +367,44 @@ export class Chapters {
         );
     }
 
+    /**
+     * How many chapters there are when the copies of one chapter (uploaded by several scanlators) count once.
+     * Chapter 0 (a prologue or the like) is not counted, the series page names it next to the total instead.
+     * Chapters without a number (specials, oneshots: stored as a negative number) are never merged, they are not the
+     * same chapter.
+     */
+    static getUniqueCount(chapters: ChapterNumberInfo[]): number {
+        const numbers = new Set<number>();
+        let withoutNumber = 0;
+
+        chapters.forEach(({ chapterNumber }) => {
+            if (chapterNumber > 0) {
+                numbers.add(chapterNumber);
+            } else if (chapterNumber < 0) {
+                withoutNumber += 1;
+            }
+        });
+
+        return numbers.size + withoutNumber;
+    }
+
+    /**
+     * How many of the chapters (each number counted once) have a decimal number like 2.5. They are real chapters and
+     * part of the total, but scanlators number them inconsistently (2.1, 2.4, 2.5 for the same kind of chapter), so
+     * the series page names how many there are next to the total.
+     */
+    static getDecimalCount(chapters: ChapterNumberInfo[]): number {
+        const numbers = new Set<number>();
+
+        chapters.forEach(({ chapterNumber }) => {
+            if (chapterNumber > 0 && !Number.isInteger(chapterNumber)) {
+                numbers.add(chapterNumber);
+            }
+        });
+
+        return numbers.size;
+    }
+
     static removeDuplicates<T extends ChapterIdInfo & ChapterScanlatorInfo & ChapterNumberInfo>(
         currentChapter: T,
         chapters: T[],

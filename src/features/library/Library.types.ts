@@ -18,6 +18,7 @@ export type MetadataLibrarySettings = {
     removeMangaFromCategories: boolean;
     showTabSize: boolean;
     splitScrollButtons: boolean;
+    swipeBetweenCategories: boolean;
     showContinueReadingButton: boolean;
     showDownloadBadge: boolean;
     showUnreadBadge: boolean;

@@ -78,10 +78,12 @@ const StyledVirtuoso = styled(VirtuosoPersisted, {
 const ChapterListFAB = ({
     selectedChapters,
     firstUnreadChapter,
+    lastReadChapter,
     onFABMenuClose,
 }: {
     selectedChapters: ChapterListFieldsFragment[];
     firstUnreadChapter: ComponentProps<typeof ResumeFab>['chapter'] | null | undefined;
+    lastReadChapter: (ComponentProps<typeof ResumeFab>['chapter'] & { lastReadAt: string }) | null | undefined;
     onFABMenuClose?: () => void;
 }) => {
     if (selectedChapters.length) {
@@ -100,8 +102,12 @@ const ChapterListFAB = ({
         );
     }
 
-    if (firstUnreadChapter) {
-        return <ResumeFab chapter={firstUnreadChapter} />;
+    // reading was started: continue where it stopped (the chapter read last, if it is not finished)
+    const isStarted = !!lastReadChapter && Number(lastReadChapter.lastReadAt) > 0;
+    const chapterToOpen =
+        isStarted && lastReadChapter && !lastReadChapter.isRead ? lastReadChapter : firstUnreadChapter;
+    if (chapterToOpen) {
+        return <ResumeFab chapter={chapterToOpen} isStarted={isStarted} />;
     }
 
     return null;
@@ -111,7 +117,10 @@ export const ChapterList = ({
     manga,
     isRefreshing,
 }: {
-    manga: Pick<MangaScreenFieldsFragment, 'id' | 'firstUnreadChapter' | 'chapters' | 'unreadCount' | 'downloadCount'>;
+    manga: Pick<
+        MangaScreenFieldsFragment,
+        'id' | 'firstUnreadChapter' | 'lastReadChapter' | 'chapters' | 'unreadCount' | 'downloadCount'
+    >;
     isRefreshing: boolean;
 }) => {
     const { t } = useLingui();
@@ -142,6 +151,18 @@ export const ChapterList = ({
     const visibleChapters = useMemo(() => filterAndSortChapters(chapters, options), [chapters, options]);
     const visibleChapterIds = useMemo(() => Chapters.getIds(visibleChapters), [visibleChapters]);
     const missingChapterCount = useMemo(() => Chapters.getMissingCount(visibleChapters), [visibleChapters]);
+    const hasChapterZero = useMemo(
+        () => visibleChapters.some(({ chapterNumber }) => chapterNumber === 0),
+        [visibleChapters],
+    );
+    const decimalChapterCount = useMemo(() => Chapters.getDecimalCount(visibleChapters), [visibleChapters]);
+    const chapterCountNote = [
+        hasChapterZero && t`+ chapter 0`,
+        decimalChapterCount > 0 &&
+            plural(decimalChapterCount, { one: 'incl. # decimal chapter', other: 'incl. # decimal chapters' }),
+    ]
+        .filter(Boolean)
+        .join(' · ');
 
     const noChaptersFound = chapters.length === 0;
     const noChaptersMatchingFilter = !noChaptersFound && visibleChapters.length === 0;
@@ -193,12 +214,19 @@ export const ChapterList = ({
                     scrollbarWidth={scrollbarYSize}
                 >
                     <Stack>
-                        <Typography variant="h5" component="h3">
-                            {plural(visibleChapters.length, {
-                                one: '# chapter',
-                                other: '# chapters',
-                            })}
-                        </Typography>
+                        <Stack direction="row" sx={{ alignItems: 'baseline', gap: 1 }}>
+                            <Typography variant="h5" component="h3">
+                                {plural(Chapters.getUniqueCount(visibleChapters), {
+                                    one: '# chapter',
+                                    other: '# chapters',
+                                })}
+                            </Typography>
+                            {!!chapterCountNote && (
+                                <Typography variant="body2" color="text.secondary">
+                                    {chapterCountNote}
+                                </Typography>
+                            )}
+                        </Stack>
                         {!!missingChapterCount && (
                             <Typography variant="body2" color="warning">
                                 {plural(missingChapterCount, {
@@ -263,6 +291,7 @@ export const ChapterList = ({
                     .map((id) => chapters.find((chapter) => chapter.id === id))
                     .filter((chapter) => chapter != null)}
                 firstUnreadChapter={manga.firstUnreadChapter}
+                lastReadChapter={manga.lastReadChapter}
                 onFABMenuClose={clearSelection}
             />
         </>

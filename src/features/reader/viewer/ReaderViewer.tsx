@@ -209,6 +209,7 @@ const BaseReaderViewer = ({
         imageRefs,
         themeDirection,
         readingDirection,
+        scrollElementRef,
     );
     useReaderScrollToStartOnPageChange(
         currentPageIndex,
@@ -348,6 +349,7 @@ const BaseReaderViewer = ({
                         isPreviousChapterVisible={previousNextChapterVisibility.previous}
                         isNextChapterVisible={previousNextChapterVisibility.next}
                         lastPageRead={coerceIn(chapter.lastPageRead, 0, chapter.pageCount - 1)}
+                        lastPageOffset={chapter.lastPageOffset}
                         currentChapterRemainingPages={currentChapterRemainingPages}
                         currentPageIndex={getReaderChapterViewerCurrentPageIndex(
                             currentPageIndex,

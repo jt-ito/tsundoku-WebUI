@@ -19,8 +19,8 @@ msgstr ""
 msgid "— State: {0}"
 msgstr "— State: {0}"
 
+#. placeholder {0}: Chapters.getUniqueCount(visibleChapters)
 #. placeholder {0}: selectedChapters.length
-#. placeholder {0}: visibleChapters.length
 #: src/features/chapter/components/ChapterList.tsx
 msgid "{0, plural, one {# chapter} other {# chapters}}"
 msgstr "{0, plural, one {# chapter} other {# chapters}}"
@@ -332,6 +332,10 @@ msgstr "{currentAutoUpdateIntervalHours}h"
 msgid "{currentDownloadAheadLimit, plural, one {# Chapter} other {# Chapters}}"
 msgstr "{currentDownloadAheadLimit, plural, one {# Chapter} other {# Chapters}}"
 
+#: src/features/chapter/components/ChapterList.tsx
+msgid "{decimalChapterCount, plural, one {incl. # decimal chapter} other {incl. # decimal chapters}}"
+msgstr "{decimalChapterCount, plural, one {incl. # decimal chapter} other {incl. # decimal chapters}}"
+
 #: src/features/manga/components/MangaBadges.tsx
 msgid "{displayedChapterCount, plural, one {# chapter} other {# chapters}}"
 msgstr "{displayedChapterCount, plural, one {# chapter} other {# chapters}}"
@@ -382,6 +386,10 @@ msgstr "{what} ({0} manga)"
 #: src/features/reader/settings/components/DefaultSettingFootnote.tsx
 msgid "*: Active setting"
 msgstr "*: Active setting"
+
+#: src/features/chapter/components/ChapterList.tsx
+msgid "+ chapter 0"
+msgstr "+ chapter 0"
 
 #: src/features/manga/services/Mangas.ts
 msgid "A migration is already in progress"
@@ -1143,6 +1151,7 @@ msgstr "Connected as {currentUsername} to {currentServerAddress}"
 msgid "Connected as {initialUsername} to {initialServerAddress}"
 msgstr "Connected as {initialUsername} to {initialServerAddress}"
 
+#: src/features/manga/components/ResumeFAB.tsx
 #: src/features/migration/components/MigrationContinueButton.tsx
 msgid "Continue"
 msgstr "Continue"
@@ -2106,6 +2115,10 @@ msgstr "Filter manga feed to display only chapters you haven’t read yet."
 #: src/features/library/components/LibraryOptionsPanel.tsx
 msgid "Filter mode"
 msgstr "Filter mode"
+
+#: src/features/library/components/LibraryToolbarMenu.tsx
+msgid "Filter/Sort"
+msgstr "Filter/Sort"
 
 #: src/features/tracker/components/cards/TrackerActiveCard.tsx
 msgid "Finish date"
@@ -3175,6 +3188,10 @@ msgstr "Offset double spreads"
 msgid "Ok"
 msgstr "Ok"
 
+#: src/features/library/screens/LibrarySettings.tsx
+msgid "On touch screens, swiping the library sideways moves to the next or previous category"
+msgstr "On touch screens, swiping the library sideways moves to the next or previous category"
+
 #: src/features/library/screens/LibraryShare.tsx
 msgid "One for one: renaming a shared category on either side renames it on the other side too"
 msgstr "One for one: renaming a shared category on either side renames it on the other side too"
@@ -3580,10 +3597,6 @@ msgstr "Restoring"
 msgid "Restoring backup…"
 msgstr "Restoring backup…"
 
-#: src/features/manga/components/ResumeFAB.tsx
-msgid "Resume"
-msgstr "Resume"
-
 #: src/base/components/feedback/EmptyView.tsx
 #: src/base/components/SpinnerImage.tsx
 #: src/features/chapter/components/buttons/ChapterDownloadRetryButton.tsx
@@ -3657,10 +3670,6 @@ msgstr "Saving theme changes…"
 #: src/features/reader/settings/layout/components/ReaderSettingPageScaleMode.tsx
 msgid "Scale type"
 msgstr "Scale type"
-
-#: src/features/chapter/components/ChapterExcludeSanlatorsFilter.tsx
-msgid "Scanlator"
-msgstr "Scanlator"
 
 #: src/features/tracker/components/cards/TrackerActiveCard.tsx
 #: src/features/tracker/components/cards/TrackerMangaCard.tsx
@@ -3885,7 +3894,6 @@ msgstr "Setting can not be changed while the reader is opened"
 #: src/features/backup/Backup.constants.ts
 #: src/features/browse/extensions/components/ExtensionCard.tsx
 #: src/features/extension/info/components/SourceCard.tsx
-#: src/features/library/components/LibraryToolbarMenu.tsx
 #: src/features/navigation-bar/NavigationBar.constants.ts
 #: src/features/reader/overlay/navigation/desktop/quick-settings/ReaderNavBarDesktopQuickSettings.tsx
 #: src/features/reader/overlay/navigation/mobile/ReaderBottomBarMobile.tsx
@@ -4206,6 +4214,10 @@ msgstr "Successfully migrated manga"
 #: src/features/backup/component/BackupFormatDialog.tsx
 msgid "Suwayomi"
 msgstr "Suwayomi"
+
+#: src/features/library/screens/LibrarySettings.tsx
+msgid "Swipe between categories"
+msgstr "Swipe between categories"
 
 #: src/features/authentication/components/UserAccountsDialog.tsx
 msgid "Switch account"

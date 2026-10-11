@@ -308,6 +308,7 @@ export type ChapterType = {
     isBookmarked: Scalars['Boolean']['output'];
     isDownloaded: Scalars['Boolean']['output'];
     isRead: Scalars['Boolean']['output'];
+    lastPageOffset: Scalars['Float']['output'];
     lastPageRead: Scalars['Int']['output'];
     lastReadAt: Scalars['LongString']['output'];
     manga: MangaType;
@@ -3668,6 +3669,7 @@ export type UpdateChapterInput = {
 export type UpdateChapterPatchInput = {
     isBookmarked?: InputMaybe<Scalars['Boolean']['input']>;
     isRead?: InputMaybe<Scalars['Boolean']['input']>;
+    lastPageOffset?: InputMaybe<Scalars['Float']['input']>;
     lastPageRead?: InputMaybe<Scalars['Int']['input']>;
 };
 

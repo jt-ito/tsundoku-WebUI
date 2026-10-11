@@ -13,7 +13,13 @@ import type { ReaderStatePages, ReadingDirection } from '@/features/reader/Reade
 import { getIndexOfPage, getPage } from '@/features/reader/overlay/progress-bar/ReaderProgressBar.utils.tsx';
 import { getScrollIntoViewInlineOption } from '@/features/reader/viewer/pager/ReaderPager.utils.tsx';
 import type { ReaderControls } from '@/features/reader/services/ReaderControls.ts';
-import { getReaderPagesStore } from '@/features/reader/stores/ReaderStore.ts';
+import {
+    getReaderChaptersStore,
+    getReaderPagesStore,
+    getReaderSettingsStore,
+} from '@/features/reader/stores/ReaderStore.ts';
+import { isContinuousVerticalReadingMode } from '@/features/reader/settings/ReaderSettings.utils.tsx';
+import { ReaderScrollOffset } from '@/features/reader/services/ReaderScrollOffset.ts';
 
 export const useReaderHandlePageSelection = (
     pageToScrollToIndex: ReaderStatePages['pageToScrollToIndex'],
@@ -24,6 +30,7 @@ export const useReaderHandlePageSelection = (
     imageRefs: MutableRefObject<(HTMLElement | null)[]>,
     themeDirection: Direction,
     readingDirection: ReadingDirection,
+    scrollElementRef: { current: HTMLElement | null },
 ) => {
     useLayoutEffect(() => {
         if (pageToScrollToIndex == null) {
@@ -39,6 +46,21 @@ export const useReaderHandlePageSelection = (
                 block: 'start',
                 inline: getScrollIntoViewInlineOption(themeDirection, readingDirection),
             });
+
+            const { currentChapter } = getReaderChaptersStore();
+            if (
+                imageRef &&
+                scrollElementRef.current &&
+                currentChapter &&
+                isContinuousVerticalReadingMode(getReaderSettingsStore().readingMode.value)
+            ) {
+                ReaderScrollOffset.applyPendingResume(
+                    currentChapter.id,
+                    getIndexOfPage(pageToScrollTo),
+                    imageRef,
+                    scrollElementRef.current,
+                );
+            }
         }
 
         const newPageIndex = getIndexOfPage(pageToScrollTo);

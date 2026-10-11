@@ -7,6 +7,7 @@
  */
 
 import Box from '@mui/material/Box';
+import { alpha, useTheme } from '@mui/material/styles';
 import Tab from '@mui/material/Tab';
 import { useLingui } from '@lingui/react/macro';
 import { TabsMenu } from '@/base/components/tabs/TabsMenu.tsx';
@@ -44,6 +45,7 @@ const BaseReaderSettingsTabs = ({
     setTransparent?: (transparent: boolean) => void;
 }) => {
     const { t } = useLingui();
+    const theme = useTheme();
     const isTouchDevice = MediaQuery.useIsTouchDevice();
 
     return (
@@ -55,9 +57,14 @@ const BaseReaderSettingsTabs = ({
                     onChange={(_, newTab) => setActiveTab(newTab)}
                     sx={{
                         ...applyStyles(!!areDefaultSettings, { zIndex: 2 }),
+                        // a quiet frosted header in the colors of the dialog, with a hairline instead of a grey slab
                         ...applyStyles(!areDefaultSettings, {
-                            backgroundColor: 'background.paper',
-                            backgroundImage: 'var(--Paper-overlay)',
+                            backgroundColor: alpha(theme.palette.background.default, 0.78),
+                            backgroundImage: 'none',
+                            backdropFilter: 'blur(14px) saturate(140%)',
+                            WebkitBackdropFilter: 'blur(14px) saturate(140%)',
+                            borderBottomWidth: 1,
+                            borderColor: alpha(theme.palette.text.primary, 0.1),
                         }),
                     }}
                 >

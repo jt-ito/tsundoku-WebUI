@@ -55,6 +55,7 @@ export const SERVER_SETTINGS_METADATA_DEFAULT: MetadataServerSettings = {
     removeMangaFromCategories: false,
     showTabSize: false,
     splitScrollButtons: false,
+    swipeBetweenCategories: true,
     showContinueReadingButton: false,
     showDownloadBadge: false,
     showUnreadBadge: false,

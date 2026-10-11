@@ -28,6 +28,7 @@ import type {
 } from '@/features/chapter/Chapter.types.ts';
 import { ChaptersDownloadActionMenuItems } from '@/features/chapter/components/actions/ChaptersDownloadActionMenuItems.tsx';
 import { Chapters } from '@/features/chapter/services/Chapters.ts';
+import { ChapterExcludeSanlatorsFilter } from '@/features/chapter/components/ChapterExcludeSanlatorsFilter.tsx';
 
 interface IProps {
     mangaId: number;
@@ -49,7 +50,8 @@ export const ChaptersToolbarMenu = ({
     const { t } = useLingui();
 
     const [open, setOpen] = React.useState(false);
-    const isFiltered = isFilterActive(options);
+    // the excluded scanlators have a button of their own, which shows when they are active
+    const isFiltered = isFilterActive({ ...options, excludedScanlators: [] });
 
     const areAllChaptersRead = useMemo(() => chapters.every(Chapters.isRead), [chapters]);
     const areAllChaptersDownloaded = useMemo(() => chapters.every(Chapters.isDownloaded), [chapters]);
@@ -85,19 +87,17 @@ export const ChaptersToolbarMenu = ({
                     </>
                 )}
             </PopupState>
+            <ChapterExcludeSanlatorsFilter
+                scanlators={scanlators}
+                excludedScanlators={excludeScanlators}
+                updateOption={updateOption}
+            />
             <CustomTooltip title={t`Filter and sort`}>
                 <IconButton onClick={() => setOpen(true)} color="inherit">
                     <FilterList color={isFiltered ? 'warning' : undefined} />
                 </IconButton>
             </CustomTooltip>
-            <ChapterOptions
-                open={open}
-                onClose={() => setOpen(false)}
-                options={options}
-                updateOption={updateOption}
-                scanlators={scanlators}
-                excludedScanlators={excludeScanlators}
-            />
+            <ChapterOptions open={open} onClose={() => setOpen(false)} options={options} updateOption={updateOption} />
         </>
     );
 };

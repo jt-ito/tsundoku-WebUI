@@ -22,15 +22,18 @@ export const ContinueReadingTooltip = ({
     name,
     sourceOrder,
     scanlator,
+    isStarted,
 }: ChapterNumberInfo &
     ChapterSourceOrderInfo &
     ChapterNameInfo &
     ChapterScanlatorInfo & {
         children: ReactElement;
+        /** reading was started: "Continue reading", whatever the position of the chapter is (default: only the first chapter starts) */
+        isStarted?: boolean;
     }) => {
     const { t } = useLingui();
 
-    const isFirstChapter = sourceOrder === 1;
+    const isFirstChapter = isStarted === undefined ? sourceOrder === 1 : !isStarted;
 
     return (
         <CustomTooltip

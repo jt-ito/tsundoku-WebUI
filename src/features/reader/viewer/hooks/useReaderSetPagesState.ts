@@ -12,10 +12,10 @@ import { createPagesData } from '@/features/reader/viewer/pager/ReaderPager.util
 import type {
     ReaderPageBackgroundColor,
     ReaderPageSpreadState,
-    ReaderResumeMode,
     ReaderStatePages,
 } from '@/features/reader/Reader.types.ts';
-import { ReaderTransitionPageMode } from '@/features/reader/Reader.types.ts';
+import { ReaderResumeMode, ReaderTransitionPageMode } from '@/features/reader/Reader.types.ts';
+import { ReaderScrollOffset } from '@/features/reader/services/ReaderScrollOffset.ts';
 import type { requestManager } from '@/lib/requests/RequestManager.ts';
 import type { TChapterReader } from '@/features/chapter/Chapter.types.ts';
 import type { ReaderChaptersStoreSlice } from '@/features/reader/stores/ReaderChaptersStore.ts';
@@ -27,6 +27,8 @@ export const useReaderSetPagesState = (
     pagesResponse: ReturnType<typeof requestManager.useGetChapterPagesFetch>[1],
     resumeMode: ReaderResumeMode,
     lastPageRead: TChapterReader['lastPageRead'] | undefined,
+    chapterId: TChapterReader['id'],
+    lastPageOffset: TChapterReader['lastPageOffset'] | undefined,
     pages: ReaderStatePages['pages'],
     pageLoadStates: ReaderStatePages['pageLoadStates'],
     pagesToSpreadState: ReaderPageSpreadState[],
@@ -58,6 +60,14 @@ export const useReaderSetPagesState = (
             UrlUtil.addParams(page, { sourceId: getReaderStore().manga?.sourceId }),
         );
         const initialReaderPageIndex = getInitialReaderPageIndex(resumeMode, lastPageRead ?? 0, newPages.length - 1);
+        if (isCurrentChapter) {
+            // webtoon style reading resumes at the exact spot in the page, not only at its top
+            ReaderScrollOffset.setPendingResume(
+                chapterId,
+                initialReaderPageIndex,
+                resumeMode === ReaderResumeMode.LAST_READ ? (lastPageOffset ?? 0) : 0,
+            );
+        }
 
         const didPagesChange = previousPageData.current !== pagesPayload?.pages;
         if (didPagesChange) {

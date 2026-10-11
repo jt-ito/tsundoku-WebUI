@@ -25,7 +25,10 @@ import { ReaderService } from '@/features/reader/services/ReaderService.ts';
 
 export function ResumeFab({
     chapter,
+    isStarted,
 }: {
+    /** reading of the manga was already started: "Continue" instead of "Start" */
+    isStarted: boolean;
     chapter: ChapterMangaInfo &
         ChapterSourceOrderInfo &
         ChapterReadInfo &
@@ -36,7 +39,6 @@ export function ResumeFab({
     const { t } = useLingui();
 
     const { sourceOrder, name, chapterNumber, scanlator } = chapter;
-    const isFirstChapter = sourceOrder === 1;
 
     return (
         <ContinueReadingTooltip
@@ -44,6 +46,7 @@ export function ResumeFab({
             name={name}
             sourceOrder={sourceOrder}
             scanlator={scanlator}
+            isStarted={isStarted}
         >
             <StyledFab
                 component={Link}
@@ -58,7 +61,7 @@ export function ResumeFab({
                 }}
             >
                 <PlayArrow />
-                {isFirstChapter ? t`Start` : t`Resume`}
+                {isStarted ? t`Continue` : t`Start`}
             </StyledFab>
         </ContinueReadingTooltip>
     );

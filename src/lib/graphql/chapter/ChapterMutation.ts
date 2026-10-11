@@ -36,6 +36,7 @@ export const UPDATE_CHAPTER = gql`
         $getBookmarked: Boolean!
         $getRead: Boolean!
         $getLastPageRead: Boolean!
+        $getManga: Boolean!
         $chapterIdToDelete: Int!
         $deleteChapter: Boolean!
         $mangaId: Int!
@@ -46,13 +47,22 @@ export const UPDATE_CHAPTER = gql`
                 id
                 isBookmarked @include(if: $getBookmarked)
                 isRead @include(if: $getRead)
-                lastReadAt @include(if: $getRead)
+                lastReadAt
                 lastPageRead @include(if: $getLastPageRead)
-                manga @include(if: $getRead) {
+                lastPageOffset @include(if: $getLastPageRead)
+                manga @include(if: $getManga) {
                     id
                     unreadCount
                     lastReadChapter {
                         id
+                        sourceOrder
+                        isRead
+                        mangaId
+                        chapterNumber
+                        name
+                        scanlator
+                        lastReadAt
+                        lastPageRead
                     }
                     latestReadChapter {
                         id
@@ -93,6 +103,7 @@ export const UPDATE_CHAPTERS = gql`
         $getBookmarked: Boolean!
         $getRead: Boolean!
         $getLastPageRead: Boolean!
+        $getManga: Boolean!
         $chapterIdsToDelete: [Int!]!
         $deleteChapters: Boolean!
         $mangaId: Int!
@@ -103,13 +114,22 @@ export const UPDATE_CHAPTERS = gql`
                 id
                 isBookmarked @include(if: $getBookmarked)
                 isRead @include(if: $getRead)
-                lastReadAt @include(if: $getRead)
+                lastReadAt
                 lastPageRead @include(if: $getLastPageRead)
-                manga @include(if: $getRead) {
+                lastPageOffset @include(if: $getLastPageRead)
+                manga @include(if: $getManga) {
                     id
                     unreadCount
                     lastReadChapter {
                         id
+                        sourceOrder
+                        isRead
+                        mangaId
+                        chapterNumber
+                        name
+                        scanlator
+                        lastReadAt
+                        lastPageRead
                     }
                     latestReadChapter {
                         id

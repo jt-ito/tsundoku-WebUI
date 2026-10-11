@@ -50,6 +50,7 @@ export const CHAPTER_READER_FIELDS = gql`
 
         uploadDate
         lastPageRead
+        lastPageOffset
         pageCount
     }
 `;

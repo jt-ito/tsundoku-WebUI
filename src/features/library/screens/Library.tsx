@@ -37,6 +37,7 @@ import { SelectionFAB } from '@/base/collection/components/SelectionFAB.tsx';
 import { MangaActionMenuItems } from '@/features/manga/components/MangaActionMenuItems.tsx';
 import { TabsMenu } from '@/base/components/tabs/TabsMenu.tsx';
 import { TabsWrapper } from '@/base/components/tabs/TabsWrapper.tsx';
+import { useHorizontalSwipe } from '@/base/hooks/useHorizontalSwipe.ts';
 import { defaultPromiseErrorHandler } from '@/lib/DefaultPromiseErrorHandler.ts';
 import type {
     GetCategoriesLibraryQuery,
@@ -73,7 +74,7 @@ export function Library() {
     const theme = useTheme();
 
     const {
-        settings: { showTabSize },
+        settings: { showTabSize, swipeBetweenCategories },
     } = useMetadataServerSettings();
 
     const {
@@ -265,6 +266,20 @@ export function Library() {
         setTabSearchParam(newTab);
     };
 
+    // phones: swipe the grid sideways to move to the next / previous category
+    const moveTab = (step: number) => {
+        const index = tabs.findIndex((tab) => tab.id === activeTab?.id);
+        const target = tabs[index + step];
+        if (target) {
+            handleTabChange(target.id);
+        }
+    };
+    const swipeHandlers = useHorizontalSwipe({
+        onSwipeLeft: () => moveTab(1),
+        onSwipeRight: () => moveTab(-1),
+        ignoreSelector: '.MuiTabs-root, [role="dialog"]',
+    });
+
     if (tabsError != null || librarySizeResponse.error) {
         return (
             <EmptyViewAbsoluteCentered
@@ -317,7 +332,7 @@ export function Library() {
     }
 
     return (
-        <TabsWrapper>
+        <TabsWrapper {...(swipeBetweenCategories ? swipeHandlers : undefined)}>
             <OffsetComponent>
                 <TabsMenu value={activeTab.id} onChange={(e, newTab) => handleTabChange(newTab)}>
                     {tabs.map((tab) => (

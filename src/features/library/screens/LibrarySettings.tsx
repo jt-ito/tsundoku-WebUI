@@ -201,6 +201,17 @@ export function LibrarySettings() {
                         onChange={(e) => setSettingValue('splitScrollButtons', e.target.checked)}
                     />
                 </ListItem>
+                <ListItem>
+                    <ListItemText
+                        primary={t`Swipe between categories`}
+                        secondary={t`On touch screens, swiping the library sideways moves to the next or previous category`}
+                    />
+                    <Switch
+                        edge="end"
+                        checked={settings.swipeBetweenCategories}
+                        onChange={(e) => setSettingValue('swipeBetweenCategories', e.target.checked)}
+                    />
+                </ListItem>
             </List>
             <GlobalUpdateSettings
                 serverSettings={serverSettings.data!.settings}

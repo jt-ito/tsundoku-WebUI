@@ -38,7 +38,11 @@ import {
 } from '@/features/reader/viewer/pager/ReaderPager.utils.tsx';
 import { TapZoneRegionType } from '@/features/reader/tap-zones/TapZoneLayout.types.ts';
 import { ReaderTapZoneService } from '@/features/reader/tap-zones/ReaderTapZoneService.ts';
-import { isContinuousReadingMode } from '@/features/reader/settings/ReaderSettings.utils.tsx';
+import {
+    isContinuousReadingMode,
+    isContinuousVerticalReadingMode,
+} from '@/features/reader/settings/ReaderSettings.utils.tsx';
+import { ReaderScrollOffset } from '@/features/reader/services/ReaderScrollOffset.ts';
 import {
     getReaderChapterFromCache,
     getReaderOpenChapterResumeMode,
@@ -85,6 +89,8 @@ const getScrollDirectionInvert = (
 
 class ReaderControlsClass {
     private updateCurrentPageTimeout: NodeJS.Timeout | undefined;
+
+    private updateOffsetTimeout: NodeJS.Timeout | undefined;
 
     private windowFocus: boolean = true;
 
@@ -450,19 +456,32 @@ class ReaderControlsClass {
         setPageToScrollToIndex(isPreviousMode ? previousPageIndex : nextPageIndex);
     }
 
-    useUpdateCurrentPageIndex(): (pageIndex: number, debounceChapterUpdate?: boolean, endReached?: boolean) => void {
+    useUpdateCurrentPageIndex(): (
+        pageIndex: number,
+        debounceChapterUpdate?: boolean,
+        endReached?: boolean,
+        offset?: number,
+    ) => void {
         const updateChapter = ReaderService.useUpdateChapter();
         const {
             settings: { downloadAheadLimit },
         } = useMetadataServerSettings();
 
         return useCallback(
-            (pageIndex, debounceChapterUpdate = true, endReached = false) => {
+            (pageIndex, debounceChapterUpdate = true, endReached = false, offset = undefined) => {
                 const { currentPageIndex, setCurrentPageIndex } = getReaderPagesStore();
                 const { currentChapter, chapters, previousChapter, nextChapter, visibleChapters } =
                     getReaderChaptersStore();
 
                 if (pageIndex === currentPageIndex && !endReached) {
+                    // still on the same page: only remember how far into it the reader is
+                    if (offset !== undefined) {
+                        clearTimeout(this.updateOffsetTimeout);
+                        this.updateOffsetTimeout = setTimeout(
+                            () => updateChapter({ lastPageRead: pageIndex, lastPageOffset: offset }),
+                            d(1).seconds.inWholeMilliseconds,
+                        );
+                    }
                     return;
                 }
 
@@ -499,10 +518,12 @@ class ReaderControlsClass {
 
                     updateChapter({
                         lastPageRead: actualPageIndex,
+                        lastPageOffset: endReached ? undefined : offset,
                         isRead: isLastPage ? true : undefined,
                     });
                 };
 
+                clearTimeout(this.updateOffsetTimeout);
                 clearTimeout(this.updateCurrentPageTimeout);
                 if (debounceChapterUpdate) {
                     this.updateCurrentPageTimeout = setTimeout(
@@ -572,7 +593,17 @@ class ReaderControlsClass {
             return;
         }
 
-        updateCurrentPageIndex(firstVisibleImageIndex, firstVisibleImageIndex !== lastPageIndex);
+        // how far into the page the reader is, to be able to resume at the exact spot in webtoon style reading
+        const scrollElement = getReaderStore().autoScroll.scrollRef?.current;
+        const firstVisibleImage = imageRefs.current[firstVisibleImageIndex];
+        const offset =
+            scrollElement &&
+            firstVisibleImage &&
+            isContinuousVerticalReadingMode(getReaderSettingsStore().readingMode.value)
+                ? ReaderScrollOffset.getOffset(firstVisibleImage, scrollElement)
+                : undefined;
+
+        updateCurrentPageIndex(firstVisibleImageIndex, firstVisibleImageIndex !== lastPageIndex, false, offset);
     }
 
     handleClick(scrollElement: HTMLElement | null, e: React.MouseEvent<HTMLDivElement, MouseEvent>): void {
