@@ -19,11 +19,34 @@
       manifest.json provides metadata used when your web app is installed on a
       user's mobile device or desktop. See https://developers.google.com/web/fundamentals/web-app-manifest/
     -->
+        <style>
+            /* iOS 26/27 home-screen apps: the system blurs the top edge unless a painted fixed element sits there. This one
+               is painted but shows nothing (background-clip: text with no text), so pages without an app bar (the reader)
+               get rid of the blur too. */
+            @media (display-mode: standalone) {
+                /* the reader keeps the system blur (iPhone and iPad) */
+                .reader-open #top-edge {
+                    display: none;
+                }
+                #top-edge {
+                    position: fixed;
+                    inset: 0 0 auto;
+                    height: 11px;
+                    z-index: 2147483647;
+                    pointer-events: none;
+                    /* the page's own background (theme, light or dark), so iOS paints the status bar area in it */
+                    background-color: var(--top-edge-color, inherit);
+                    -webkit-background-clip: text;
+                    background-clip: text;
+                }
+            }
+        </style>
         <link rel="manifest" href="/site.webmanifest" crossorigin="use-credentials" />
     </head>
     <body>
         <noscript>You need to enable JavaScript to run this app.</noscript>
         <div id="root"></div>
+        <div id="top-edge" aria-hidden="true"></div>
         <script type="module" src="./src/index.tsx"></script>
         <script>
             const backgroundColor = (() => {

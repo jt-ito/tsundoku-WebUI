@@ -159,6 +159,26 @@ export const AppThemeContextProvider = ({ children }: { children: ReactNode }) =
         }
     }, [theme.palette.background.default]);
 
+    // iOS reads the color of the invisible strip at the top edge (#top-edge in index.html) once and keeps it until the
+    // app is restarted, unless the strip is changed and repainted: so it gets the new background and is replaced
+    useEffect(() => {
+        const frame = requestAnimationFrame(() => {
+            const strip = document.getElementById('top-edge');
+            if (!strip) {
+                return;
+            }
+
+            document.documentElement.style.setProperty(
+                '--top-edge-color',
+                getComputedStyle(document.body).backgroundColor,
+            );
+            // a one-pixel nudge was not enough for iOS: swap in a fresh copy of the strip
+            strip.replaceWith(strip.cloneNode());
+        });
+
+        return () => cancelAnimationFrame(frame);
+    }, [theme.palette.background.default, theme.palette.mode]);
+
     if (directionRef.current !== currentDirection) {
         document.dir = currentDirection;
         directionRef.current = currentDirection;

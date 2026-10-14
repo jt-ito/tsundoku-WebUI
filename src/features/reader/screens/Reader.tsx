@@ -155,6 +155,15 @@ const BaseReader = ({
 
     const direction = READING_DIRECTION_TO_THEME_DIRECTION[readingDirection.value];
 
+    // the reader keeps the system blur in the status bar area of a home-screen app (see #top-edge in index.html)
+    useEffect(() => {
+        const root = document.documentElement;
+        root.classList.add('reader-open');
+        return () => {
+            root.classList.remove('reader-open');
+        };
+    }, []);
+
     useEffect(() => {
         getReaderStore().setManga(mangaResponse.data?.manga);
     }, [mangaResponse.data?.manga]);
