@@ -1963,10 +1963,6 @@ msgstr "Example for possible values: 1 (bytes), 1KB (kilobytes), 1MB (megabytes)
 msgid "Exclude"
 msgstr "Exclude"
 
-#: src/features/chapter/components/ChapterExcludeSanlatorsFilter.tsx
-msgid "Exclude scanlators"
-msgstr "Exclude scanlators"
-
 #: src/features/backup/screens/Backup.tsx
 #: src/features/category/components/CategoriesInclusionSetting.tsx
 msgid "Exclude: {excludedCategoriesText}"
@@ -3671,6 +3667,10 @@ msgstr "Saving theme changes…"
 msgid "Scale type"
 msgstr "Scale type"
 
+#: src/features/chapter/components/ChapterScanlatorsFilter.tsx
+msgid "Scanlators"
+msgstr "Scanlators"
+
 #: src/features/tracker/components/cards/TrackerActiveCard.tsx
 #: src/features/tracker/components/cards/TrackerMangaCard.tsx
 msgid "Score"
@@ -3968,6 +3968,10 @@ msgstr "Show number of items"
 #: src/features/settings/screens/ServerSettings.tsx
 msgid "Show only downloaded chapters"
 msgstr "Show only downloaded chapters"
+
+#: src/features/chapter/components/ChapterScanlatorsFilter.tsx
+msgid "Show only these scanlators"
+msgstr "Show only these scanlators"
 
 #: src/features/settings/screens/ServerSettings.tsx
 msgid "Show only unread chapters"

@@ -245,7 +245,8 @@ export const ChapterList = ({
                                 updateOption={updateOption}
                                 chapters={visibleChapters}
                                 scanlators={Chapters.getScanlators(chapters)}
-                                excludeScanlators={options.excludedScanlators}
+                                includedScanlators={options.includedScanlators}
+                                excludedScanlators={options.excludedScanlators}
                             />
                         )}
                         {!!visibleChapterIds.length && (

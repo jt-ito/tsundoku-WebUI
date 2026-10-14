@@ -28,7 +28,7 @@ import type {
 } from '@/features/chapter/Chapter.types.ts';
 import { ChaptersDownloadActionMenuItems } from '@/features/chapter/components/actions/ChaptersDownloadActionMenuItems.tsx';
 import { Chapters } from '@/features/chapter/services/Chapters.ts';
-import { ChapterExcludeSanlatorsFilter } from '@/features/chapter/components/ChapterExcludeSanlatorsFilter.tsx';
+import { ChapterScanlatorsFilter } from '@/features/chapter/components/ChapterScanlatorsFilter.tsx';
 
 interface IProps {
     mangaId: number;
@@ -36,7 +36,8 @@ interface IProps {
     updateOption: ReturnType<typeof updateChapterListOptions>;
     chapters: (ChapterIdInfo & ChapterReadInfo & ChapterDownloadInfo & ChapterBookmarkInfo)[];
     scanlators: string[];
-    excludeScanlators: string[];
+    includedScanlators: string[];
+    excludedScanlators: string[];
 }
 
 export const ChaptersToolbarMenu = ({
@@ -45,13 +46,14 @@ export const ChaptersToolbarMenu = ({
     updateOption,
     chapters,
     scanlators,
-    excludeScanlators,
+    includedScanlators,
+    excludedScanlators,
 }: IProps) => {
     const { t } = useLingui();
 
     const [open, setOpen] = React.useState(false);
     // the excluded scanlators have a button of their own, which shows when they are active
-    const isFiltered = isFilterActive({ ...options, excludedScanlators: [] });
+    const isFiltered = isFilterActive({ ...options, includedScanlators: [], excludedScanlators: [] });
 
     const areAllChaptersRead = useMemo(() => chapters.every(Chapters.isRead), [chapters]);
     const areAllChaptersDownloaded = useMemo(() => chapters.every(Chapters.isDownloaded), [chapters]);
@@ -87,9 +89,10 @@ export const ChaptersToolbarMenu = ({
                     </>
                 )}
             </PopupState>
-            <ChapterExcludeSanlatorsFilter
+            <ChapterScanlatorsFilter
                 scanlators={scanlators}
-                excludedScanlators={excludeScanlators}
+                includedScanlators={includedScanlators}
+                excludedScanlators={excludedScanlators}
                 updateOption={updateOption}
             />
             <CustomTooltip title={t`Filter and sort`}>

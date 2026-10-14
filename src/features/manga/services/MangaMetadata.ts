@@ -34,6 +34,7 @@ const convertAppMetadataToGqlMetadata = (
 ): Metadata<string, AllowedMetadataValueTypes> => ({
     ...metadata,
     excludedScanlators: JSON.stringify(metadata.excludedScanlators),
+    includedScanlators: JSON.stringify(metadata.includedScanlators),
 });
 
 const getMangaMetadataWithDefaultValueFallback = (

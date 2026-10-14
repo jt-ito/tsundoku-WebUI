@@ -61,8 +61,19 @@ function bookmarkedFilter(
     }
 }
 
-function scanlatorFilter(excludedScanlators: string[], { scanlator }: ChapterScanlatorInfo): boolean {
-    return !scanlator || !excludedScanlators.includes(scanlator);
+function scanlatorFilter(
+    {
+        includedScanlators,
+        excludedScanlators,
+    }: Pick<ChapterListFilterOptions, 'includedScanlators' | 'excludedScanlators'>,
+    { scanlator }: ChapterScanlatorInfo,
+): boolean {
+    if (!scanlator) {
+        return true;
+    }
+
+    // "show only these" wins, the older "hide these" setting only applies while there is no such list
+    return includedScanlators.length ? includedScanlators.includes(scanlator) : !excludedScanlators.includes(scanlator);
 }
 
 type TChapterSort = ChapterSourceOrderInfo & ChapterNumberInfo & Pick<ChapterType, 'fetchedAt' | 'uploadDate'>;
@@ -103,7 +114,7 @@ export function filterChapters<Chapters extends TChapterFilter>(
             unreadFilter(options.unread, chp) &&
             downloadFilter(options.downloaded, chp) &&
             bookmarkedFilter(options.bookmarked, chp) &&
-            scanlatorFilter(options.excludedScanlators, chp),
+            scanlatorFilter(options, chp),
     );
 }
 
@@ -117,17 +128,40 @@ export function filterAndSortChapters<Chapters extends TChapterSort & TChapterFi
 }
 
 export const isFilterActive = (options: ChapterListFilterOptions) => {
-    const { unread, downloaded, bookmarked, excludedScanlators } = options;
-    return unread != null || downloaded != null || bookmarked != null || !!excludedScanlators.length;
+    const { unread, downloaded, bookmarked, includedScanlators, excludedScanlators } = options;
+    return (
+        unread != null ||
+        downloaded != null ||
+        bookmarked != null ||
+        !!includedScanlators.length ||
+        !!excludedScanlators.length
+    );
 };
 
 export const useChapterListOptions = (manga: MangaIdInfo & GqlMetaHolder): ChapterListOptions => {
-    const { unread, downloaded, bookmarked, reverse, sortBy, showChapterNumber, excludedScanlators } =
-        useGetMangaMetadata(manga);
+    const {
+        unread,
+        downloaded,
+        bookmarked,
+        reverse,
+        sortBy,
+        showChapterNumber,
+        includedScanlators,
+        excludedScanlators,
+    } = useGetMangaMetadata(manga);
 
     return useMemo(
-        () => ({ unread, downloaded, bookmarked, reverse, sortBy, showChapterNumber, excludedScanlators }),
-        [unread, downloaded, bookmarked, reverse, sortBy, showChapterNumber, excludedScanlators],
+        () => ({
+            unread,
+            downloaded,
+            bookmarked,
+            reverse,
+            sortBy,
+            showChapterNumber,
+            includedScanlators,
+            excludedScanlators,
+        }),
+        [unread, downloaded, bookmarked, reverse, sortBy, showChapterNumber, includedScanlators, excludedScanlators],
     );
 };
 

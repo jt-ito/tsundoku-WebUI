@@ -15,6 +15,9 @@ export interface ChapterListFilterOptions {
     unread: NullAndUndefined<boolean>;
     downloaded: NullAndUndefined<boolean>;
     bookmarked: NullAndUndefined<boolean>;
+    /** show only the chapters of these scanlators (none: every scanlator) */
+    includedScanlators: string[];
+    /** older setting, "hide these scanlators": replaced by the list above the next time the filter is saved */
     excludedScanlators: string[];
 }
 
