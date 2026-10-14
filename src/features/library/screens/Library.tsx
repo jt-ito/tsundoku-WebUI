@@ -236,7 +236,11 @@ export function Library() {
                     <AppbarSearch searchHistoryKey="library" suggestions={mangaTitles} liveSearch />
                     <LibraryToolbarMenu category={activeTab} mangas={mangas} />
                     <SyncButton />
-                    <UpdateChecker categoryId={activeTab?.id} categoryName={activeTab?.name} />
+                    <UpdateChecker
+                        categoryId={activeTab?.id}
+                        categoryName={activeTab?.name}
+                        handleFinishedUpdate={retryFetchCategoryMangas}
+                    />
                 </>
             )}
             {!!mangas.length && (
