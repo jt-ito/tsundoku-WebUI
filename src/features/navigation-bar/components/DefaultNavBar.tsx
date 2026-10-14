@@ -6,7 +6,7 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import { useCallback, useLayoutEffect, useMemo, useRef } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef } from 'react';
 import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
@@ -76,15 +76,32 @@ export function DefaultNavBar() {
         [NavBarComponent, visibleNavBarItems],
     );
 
-    useResizeObserver(
-        appBarRef,
-        useCallback(() => {
-            // bottom edge (includes the top gap + safe area) plus the gap below, so content starts under the pill with breathing room
-            setAppBarHeight(
-                appBarRef.current ? Math.ceil(appBarRef.current.getBoundingClientRect().bottom) + APP_BAR_GAP : 0,
-            );
-        }, [appBarRef.current]),
-    );
+    const measureAppBar = useCallback(() => {
+        // bottom edge (includes the top gap + safe area) plus the gap below, so content starts under the pill with breathing room
+        setAppBarHeight(
+            appBarRef.current ? Math.ceil(appBarRef.current.getBoundingClientRect().bottom) + APP_BAR_GAP : 0,
+        );
+    }, [appBarRef.current]);
+
+    useResizeObserver(appBarRef, measureAppBar);
+
+    // Rotating a phone changes the safe area without always changing the bar's own size (iOS also reports
+    // stale values mid-rotation), which left the sticky tabs offset by the landscape height. Measure again once it settles.
+    useEffect(() => {
+        let timer: ReturnType<typeof setTimeout>;
+        const remeasure = () => {
+            measureAppBar();
+            clearTimeout(timer);
+            timer = setTimeout(measureAppBar, 300);
+        };
+        window.addEventListener('resize', remeasure);
+        window.addEventListener('orientationchange', remeasure);
+        return () => {
+            clearTimeout(timer);
+            window.removeEventListener('resize', remeasure);
+            window.removeEventListener('orientationchange', remeasure);
+        };
+    }, [measureAppBar]);
 
     useLayoutEffect(() => {
         if (override.status) {
