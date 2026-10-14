@@ -249,10 +249,10 @@ export const DEFAULT_READER_SETTINGS: IReaderSettings = {
     shouldUseInfiniteScroll: true,
     shouldShowTransitionPage: true,
     safeAreaInset: {
-        top: true,
-        right: true,
-        bottom: true,
-        left: true,
+        top: false,
+        right: false,
+        bottom: false,
+        left: false,
     },
     shouldEnterFullscreen: false,
 };
