@@ -79,11 +79,14 @@ const ChapterListFAB = ({
     selectedChapters,
     firstUnreadChapter,
     lastReadChapter,
+    nextUnreadChapter,
     onFABMenuClose,
 }: {
     selectedChapters: ChapterListFieldsFragment[];
     firstUnreadChapter: ComponentProps<typeof ResumeFab>['chapter'] | null | undefined;
     lastReadChapter: (ComponentProps<typeof ResumeFab>['chapter'] & { lastReadAt: string }) | null | undefined;
+    /** the first unread chapter after the one read last */
+    nextUnreadChapter: ComponentProps<typeof ResumeFab>['chapter'] | null | undefined;
     onFABMenuClose?: () => void;
 }) => {
     if (selectedChapters.length) {
@@ -102,10 +105,13 @@ const ChapterListFAB = ({
         );
     }
 
-    // reading was started: continue where it stopped (the chapter read last, if it is not finished)
+    // reading was started: continue where it stopped (the chapter read last, if it is not finished, else the next
+    // unread one after it; only when there is none the first unread chapter, so finishing chapter 457 does not jump to 1)
     const isStarted = !!lastReadChapter && Number(lastReadChapter.lastReadAt) > 0;
     const chapterToOpen =
-        isStarted && lastReadChapter && !lastReadChapter.isRead ? lastReadChapter : firstUnreadChapter;
+        isStarted && lastReadChapter && !lastReadChapter.isRead
+            ? lastReadChapter
+            : (isStarted && nextUnreadChapter) || firstUnreadChapter;
     if (chapterToOpen) {
         return <ResumeFab chapter={chapterToOpen} isStarted={isStarted} />;
     }
@@ -147,6 +153,20 @@ export const ChapterList = ({
         manga.id,
     );
     const chapters = chaptersData?.chapters.nodes ?? STABLE_EMPTY_ARRAY;
+
+    const lastReadNumber = manga.lastReadChapter?.chapterNumber;
+    const nextUnreadChapter = useMemo(
+        () =>
+            lastReadNumber === undefined
+                ? null
+                : chapters
+                      .filter((chapter) => !chapter.isRead && chapter.chapterNumber > lastReadNumber)
+                      .reduce<(typeof chapters)[number] | null>(
+                          (next, chapter) => (!next || chapter.chapterNumber < next.chapterNumber ? chapter : next),
+                          null,
+                      ),
+        [chapters, lastReadNumber],
+    );
 
     const visibleChapters = useMemo(() => filterAndSortChapters(chapters, options), [chapters, options]);
     const visibleChapterIds = useMemo(() => Chapters.getIds(visibleChapters), [visibleChapters]);
@@ -293,6 +313,7 @@ export const ChapterList = ({
                     .filter((chapter) => chapter != null)}
                 firstUnreadChapter={manga.firstUnreadChapter}
                 lastReadChapter={manga.lastReadChapter}
+                nextUnreadChapter={nextUnreadChapter}
                 onFABMenuClose={clearSelection}
             />
         </>
