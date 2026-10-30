@@ -19,6 +19,7 @@ type ScrollTarget = 'top' | 'bottom' | null;
 
 const SMALL_FAB_SIZE = 40;
 const SPLIT_FAB_GAP = 8;
+const AUTO_HIDE_MS = 1500;
 
 const getTarget = (): ScrollTarget => {
     const max = document.documentElement.scrollHeight - window.innerHeight;
@@ -45,6 +46,8 @@ export const LibraryScrollFab = ({ contentKey, isRaised }: { contentKey: unknown
     } = useMetadataServerSettings();
     const [target, setTarget] = useState<ScrollTarget>(null);
     const [position, setPosition] = useState({ atTop: true, atBottom: false });
+    // shown while the page is scrolling, hidden again after a moment so the buttons do not cover the grid
+    const [isVisible, setIsVisible] = useState(true);
 
     useEffect(() => {
         const update = () => {
@@ -54,14 +57,26 @@ export const LibraryScrollFab = ({ contentKey, isRaised }: { contentKey: unknown
             const atBottom = window.scrollY >= max - 1;
             setPosition((prev) => (prev.atTop === atTop && prev.atBottom === atBottom ? prev : { atTop, atBottom }));
         };
+        let hideTimeout: ReturnType<typeof setTimeout>;
+        const show = () => {
+            setIsVisible(true);
+            clearTimeout(hideTimeout);
+            hideTimeout = setTimeout(() => setIsVisible(false), AUTO_HIDE_MS);
+        };
+        const onScroll = () => {
+            update();
+            show();
+        };
         update();
+        show();
         // re-check after the grid has laid out for the new category/filter
         const timeout = setTimeout(update, 500);
-        window.addEventListener('scroll', update, { passive: true });
+        window.addEventListener('scroll', onScroll, { passive: true });
         window.addEventListener('resize', update);
         return () => {
             clearTimeout(timeout);
-            window.removeEventListener('scroll', update);
+            clearTimeout(hideTimeout);
+            window.removeEventListener('scroll', onScroll);
             window.removeEventListener('resize', update);
         };
     }, [contentKey]);
@@ -80,9 +95,11 @@ export const LibraryScrollFab = ({ contentKey, isRaised }: { contentKey: unknown
             // lined up with the 48px FABs
             right: `calc(${DEFAULT_FAB_STYLE.right} + 4px)`,
             zIndex: 1,
-            transition: 'transform 0.15s cubic-bezier(0.23, 1, 0.32, 1), opacity 0.15s ease',
+            transition: 'transform 0.15s cubic-bezier(0.23, 1, 0.32, 1), opacity 0.25s ease, visibility 0.25s',
             '&:active': { transform: 'scale(0.96)' },
-            '&.Mui-disabled': { opacity: 0.35 },
+            opacity: isVisible ? 1 : 0,
+            visibility: isVisible ? 'visible' : 'hidden',
+            '&.Mui-disabled': { opacity: isVisible ? 0.35 : 0 },
             [theme.breakpoints.down('md')]: { bottom: bottom(offset) },
         });
 
@@ -124,7 +141,9 @@ export const LibraryScrollFab = ({ contentKey, isRaised }: { contentKey: unknown
                     bottom: `calc(${DEFAULT_FAB_STYLE.bottom} + ${DEFAULT_FAB_STYLE.height} + 16px)`,
                 }),
                 zIndex: 1,
-                transition: 'transform 0.15s cubic-bezier(0.23, 1, 0.32, 1)',
+                transition: 'transform 0.15s cubic-bezier(0.23, 1, 0.32, 1), opacity 0.25s ease, visibility 0.25s',
+                opacity: isVisible ? 1 : 0,
+                visibility: isVisible ? 'visible' : 'hidden',
                 '&:active': { transform: 'scale(0.96)' },
                 // on phones the floating navigation bar sits at the bottom: stay above it
                 [theme.breakpoints.down('md')]: {
