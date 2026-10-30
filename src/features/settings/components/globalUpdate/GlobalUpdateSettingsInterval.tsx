@@ -36,6 +36,20 @@ export const GlobalUpdateSettingsInterval = ({
         getPersistedServerSetting,
     );
 
+    // an update goes through every series, one request at a time per source: a library of a few thousand series
+    // takes hours, and an update that is still running when the next one is due makes them run back to back
+    const getIntervalWarning = (hours: number) => {
+        if (hours > 0 && hours < GLOBAL_UPDATE_INTERVAL.warnStronglyBelow) {
+            return t`Very frequent. An update checks every series, so a large library can need longer than this to finish. Updates would then run back to back, which loads the sources heavily and can get you rate limited or blocked.`;
+        }
+
+        if (hours > 0 && hours < GLOBAL_UPDATE_INTERVAL.warnBelow) {
+            return t`Frequent. Large libraries (thousands of series) can take hours to update, and many sources rate limit or block clients that ask too often. ${GLOBAL_UPDATE_INTERVAL.warnBelow} hours or more is recommended.`;
+        }
+
+        return undefined;
+    };
+
     const updateSetting = useCallback(
         (newGlobalUpdateInterval: number) => {
             persistAutoUpdateIntervalHours(
@@ -62,9 +76,9 @@ export const GlobalUpdateSettingsInterval = ({
                 settingValue={t`${currentAutoUpdateIntervalHours}h`}
                 value={currentAutoUpdateIntervalHours}
                 minValue={GLOBAL_UPDATE_INTERVAL.min}
-                maxValue={GLOBAL_UPDATE_INTERVAL.max}
+                stepSize={GLOBAL_UPDATE_INTERVAL.min}
                 defaultValue={GLOBAL_UPDATE_INTERVAL.default}
-                showSlider
+                getWarning={getIntervalWarning}
                 valueUnit={t`h`}
                 handleUpdate={updateSetting}
                 disabled={!doAutoUpdates}

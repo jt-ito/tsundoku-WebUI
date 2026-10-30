@@ -38,6 +38,8 @@ type BaseProps = {
     dialogTitle?: string;
     dialogDescription?: string;
     dialogDisclaimer?: string;
+    /** shown under the input while it returns a text, e.g. to warn about a risky value */
+    getWarning?: (value: number) => string | undefined;
     valueUnit: string;
     handleUpdate: (value: number) => void;
     showSlider?: never;
@@ -57,6 +59,7 @@ export const NumberSetting = ({
     settingIcon,
     dialogDescription,
     dialogDisclaimer,
+    getWarning,
     value,
     defaultValue,
     minValue,
@@ -76,6 +79,7 @@ export const NumberSetting = ({
     const [dialogValue, setDialogValue] = useState(value);
     const [originalValue, setOriginalValue] = useState(value);
 
+    const warning = getWarning?.(dialogValue);
     const isInvalid =
         (minValue !== undefined && minValue > dialogValue) || (maxValue !== undefined && maxValue < dialogValue);
 
@@ -185,6 +189,14 @@ export const NumberSetting = ({
                             },
                         }}
                     />
+                    {warning && (
+                        <Stack direction="row" sx={{ alignItems: 'center', paddingTop: '10px' }}>
+                            <WarningIcon color="warning" />
+                            <Typography variant="body2" sx={{ marginLeft: '10px', whiteSpace: 'pre-line' }}>
+                                {warning}
+                            </Typography>
+                        </Stack>
+                    )}
                     {showSlider ? (
                         <Slider
                             aria-label="number-setting-slider"

@@ -198,8 +198,11 @@ export const WEB_UI_INTERFACE_SELECT_VALUES: SelectSettingValue<WebUiInterface>[
 
 export const GLOBAL_UPDATE_INTERVAL = {
     default: d(12).hours.inWholeHours,
-    min: d(6).hours.inWholeHours,
-    max: d(1).months.inWholeHours,
+    // 15 minutes: 0 turns the updates off, anything above is the user's choice (see the warning in the setting)
+    min: 0.25,
+    // below these many hours the setting warns, a big library may not finish an update in that time
+    warnBelow: 6,
+    warnStronglyBelow: 1,
 };
 
 export const GLOBAL_UPDATE_SKIP_ENTRIES_TO_TRANSLATION: {
