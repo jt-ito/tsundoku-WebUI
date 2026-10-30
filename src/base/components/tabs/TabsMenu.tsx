@@ -9,6 +9,7 @@
 import type { TabsProps } from '@mui/material/Tabs';
 import Tabs from '@mui/material/Tabs';
 import { styled } from '@mui/material/styles';
+import { useEffect, useRef } from 'react';
 
 const StyledTabsMenu = styled(Tabs)(({ theme }) => ({
     display: 'flex',
@@ -32,15 +33,42 @@ const StyledTabsMenu = styled(Tabs)(({ theme }) => ({
     '& .MuiTabs-flexContainer': { paddingInline: 8 },
 }));
 
-export const TabsMenu = ({ children, ...props }: TabsProps) => (
-    <StyledTabsMenu
-        indicatorColor="primary"
-        textColor="primary"
-        variant="scrollable"
-        scrollButtons="auto"
-        allowScrollButtonsMobile
-        {...props}
-    >
-        {children}
-    </StyledTabsMenu>
-);
+export const TabsMenu = ({ children, ...props }: TabsProps) => {
+    const ref = useRef<HTMLDivElement>(null);
+
+    // a mouse wheel scrolls the tabs sideways (touch screens and trackpads already do), as long as they overflow;
+    // at the ends it does not fall through to the page, so the page only scrolls when the pointer is elsewhere
+    useEffect(() => {
+        const element = ref.current;
+        const scroller = element?.querySelector<HTMLElement>('.MuiTabs-scroller');
+        if (!element || !scroller) {
+            return undefined;
+        }
+
+        const onWheel = (e: WheelEvent) => {
+            if (Math.abs(e.deltaY) <= Math.abs(e.deltaX) || scroller.scrollWidth <= scroller.clientWidth) {
+                return;
+            }
+
+            e.preventDefault();
+            scroller.scrollLeft += e.deltaY;
+        };
+
+        element.addEventListener('wheel', onWheel, { passive: false });
+        return () => element.removeEventListener('wheel', onWheel);
+    }, []);
+
+    return (
+        <StyledTabsMenu
+            ref={ref}
+            indicatorColor="primary"
+            textColor="primary"
+            variant="scrollable"
+            scrollButtons="auto"
+            allowScrollButtonsMobile
+            {...props}
+        >
+            {children}
+        </StyledTabsMenu>
+    );
+};

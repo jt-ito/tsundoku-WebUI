@@ -2194,6 +2194,11 @@ msgstr "Forget manga categories"
 msgid "Fourth to last read chapter"
 msgstr "Fourth to last read chapter"
 
+#. placeholder {0}: GLOBAL_UPDATE_INTERVAL.warnBelow
+#: src/features/settings/components/globalUpdate/GlobalUpdateSettingsInterval.tsx
+msgid "Frequent. Large libraries (thousands of series) can take hours to update, and many sources rate limit or block clients that ask too often. {0} hours or more is recommended."
+msgstr "Frequent. Large libraries (thousands of series) can take hours to update, and many sources rate limit or block clients that ask too often. {0} hours or more is recommended."
+
 #. placeholder {0}: first.senderUsername
 #. placeholder {1}: describe(first)
 #: src/features/library/screens/LibraryShare.tsx
@@ -4791,6 +4796,10 @@ msgstr "Version {0}"
 #: src/features/reader/settings/layout/components/ReaderSettingTapZoneInvertMode.tsx
 msgid "Vertical"
 msgstr "Vertical"
+
+#: src/features/settings/components/globalUpdate/GlobalUpdateSettingsInterval.tsx
+msgid "Very frequent. An update checks every series, so a large library can need longer than this to finish. Updates would then run back to back, which loads the sources heavily and can get you rate limited or blocked."
+msgstr "Very frequent. An update checks every series, so a large library can need longer than this to finish. Updates would then run back to back, which loads the sources heavily and can get you rate limited or blocked."
 
 #: src/features/settings/Settings.constants.ts
 msgid "VUI"
