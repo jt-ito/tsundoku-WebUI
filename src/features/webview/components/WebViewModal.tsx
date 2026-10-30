@@ -165,7 +165,7 @@ export const WebViewModal = () => {
                         <IconButton
                             size="small"
                             onClick={() => {
-                                window.open(url!, '_blank', 'noopener,noreferrer');
+                                window.open(withSessionToken(url!), '_blank', 'noopener,noreferrer');
                                 close();
                             }}
                         >
