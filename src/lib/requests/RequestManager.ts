@@ -535,6 +535,24 @@ const evictLibraryData = (cache: ApolloCache): void => {
     cache.gc();
 };
 
+/**
+ * The category ids a cached manga list was asked for. The cache key of the field holds the arguments chosen by its
+ * `keyArgs`: `mangas:{"condition":{"categoryIds":[3],"inLibrary":true}}`.
+ */
+const getCategoryIdsOfMangasField = (storeFieldName: string): number[] => {
+    const start = storeFieldName.indexOf(':');
+    if (start < 0) {
+        return [];
+    }
+
+    try {
+        const args = JSON.parse(storeFieldName.slice(start + 1));
+        return Array.isArray(args?.condition?.categoryIds) ? args.condition.categoryIds : [];
+    } catch {
+        return [];
+    }
+};
+
 // TODO - correctly update cache after all mutations instead of refetching queries
 export class RequestManager {
     public static readonly API_VERSION = '/api/v1/';
@@ -2505,18 +2523,74 @@ export class RequestManager {
         );
 
         response.response.then(() => {
+            const movedMangaIds = new Set(mangaIds);
+            const removedFromCategoryIds = new Set(patch.removeFromCategories ?? []);
+            const isRemovedFromAllCategories = !!patch.clearCategories;
+            // manga that get a category (and are not kept in the Default one) are no longer in the Default category
+            const isLeavingDefault =
+                !!patch.addToCategories?.some((categoryId) => categoryId !== 0) && !patch.addToCategories?.includes(0);
+
+            // Manga that left a list are taken out of it right away. Evicting the list instead keeps the old one on screen
+            // until the reload is done, so a moved manga seemed to stay in its old category for a moment.
+            const withoutMovedMangas = (list: any, readField: (fieldName: string, from: any) => unknown) => {
+                if (!Array.isArray(list?.nodes)) {
+                    return undefined;
+                }
+
+                const nodes = list.nodes.filter((node: any) => !movedMangaIds.has(readField('id', node) as number));
+                const removedCount = list.nodes.length - nodes.length;
+
+                return {
+                    ...list,
+                    nodes,
+                    totalCount: Math.max(0, (list.totalCount ?? list.nodes.length) - removedCount),
+                };
+            };
+
             this.graphQLClient.client.refetchQueries({
+                // A list that was edited above is complete and already right: refetching it would keep the old list on
+                // screen until the response is in. Everything that was evicted is incomplete and is refetched as usual.
+                onQueryUpdated: (_observableQuery, diff) => (diff.complete ? diff.result : true),
                 updateCache(cache) {
                     const data = (cache as InMemoryCache).extract();
+                    // the default category holds every manga that has no other category
+                    const defaultCategoryRef = cache.identify({ __typename: 'CategoryType', id: 0 });
 
                     for (const [id, value] of Object.entries(data)) {
-                        if ((value as any).__typename === 'CategoryType') {
+                        const isDefaultCategoryToKeep = id === defaultCategoryRef && isLeavingDefault;
+                        if ((value as any).__typename === 'CategoryType' && !isDefaultCategoryToKeep) {
                             cache.evict({ id });
                         }
                     }
 
+                    if (defaultCategoryRef && isLeavingDefault) {
+                        cache.modify({
+                            id: defaultCategoryRef,
+                            fields: {
+                                mangas(existing, { readField }) {
+                                    return withoutMovedMangas(existing, readField) ?? existing;
+                                },
+                            },
+                        });
+                    }
+
                     cache.evict({ fieldName: 'categories' });
-                    cache.evict({ fieldName: 'mangas' });
+                    cache.modify({
+                        fields: {
+                            mangas(existing, { DELETE, storeFieldName, readField }) {
+                                const isListOfLeftCategory =
+                                    isRemovedFromAllCategories ||
+                                    getCategoryIdsOfMangasField(storeFieldName).some((categoryId) =>
+                                        removedFromCategoryIds.has(categoryId),
+                                    );
+
+                                return (
+                                    (isListOfLeftCategory ? withoutMovedMangas(existing, readField) : undefined) ??
+                                    DELETE
+                                );
+                            },
+                        },
+                    });
                 },
             });
         });
@@ -3196,7 +3270,7 @@ export class RequestManager {
         patch: UpdateCategoryPatchInput,
         options?: MutationOptions<UpdateCategoryMutation, UpdateCategoryMutationVariables>,
     ): AbortableApolloMutationResponse<UpdateCategoryMutation> {
-        return this.doRequest<UpdateCategoryMutation, UpdateCategoryMutationVariables>(
+        const response = this.doRequest<UpdateCategoryMutation, UpdateCategoryMutationVariables>(
             GQLMethod.MUTATION,
             UPDATE_CATEGORY,
             {
@@ -3208,6 +3282,21 @@ export class RequestManager {
             },
             options,
         );
+
+        if (patch.default != null) {
+            // while the Default category is deleted, marking a category as the default one takes the mark off another one
+            response.response.then(
+                () =>
+                    this.graphQLClient.client.refetchQueries({
+                        updateCache(cache) {
+                            cache.evict({ fieldName: 'categories' });
+                        },
+                    }),
+                () => undefined,
+            );
+        }
+
+        return response;
     }
 
     public updateCategoryMeta(

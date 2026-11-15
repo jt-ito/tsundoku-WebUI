@@ -86,7 +86,11 @@ export function Library() {
         GET_CATEGORIES_LIBRARY,
     );
     const tabsData = categoriesResponse?.categories.nodes.filter(
-        (category) => category.id !== 0 || (category.id === 0 && category.mangas.totalCount),
+        // an empty Default tab stays hidden, unless the user brought it back after deleting it
+        (category) =>
+            category.id !== 0 ||
+            category.mangas.totalCount ||
+            category.meta.some((meta) => meta.key === 'default_category_restored'),
     );
     const tabs = tabsData ?? STABLE_EMPTY_ARRAY;
 
