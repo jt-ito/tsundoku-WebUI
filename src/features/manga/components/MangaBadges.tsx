@@ -174,6 +174,11 @@ export const MangaBadges = ({
                                 display: 'none',
                                 height: PILL_HEIGHT,
                                 minHeight: 0,
+                                // a long label ("Remove from the library", or a longer translation) shrinks with an ellipsis instead of
+                                // wrapping into the fixed pill height, where it was cut off
+                                minWidth: 0,
+                                maxWidth: '100%',
+                                whiteSpace: 'nowrap',
                                 gap: 0.75,
                                 borderRadius: 9999,
                                 paddingInline: 1.25,
@@ -193,15 +198,22 @@ export const MangaBadges = ({
                             };
                         }}
                     >
-                        {isInLibrary ? t`Remove from the library` : t`Add To Library`}
+                        <span style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                            {isInLibrary ? t`Remove from the library` : t`Add To Library`}
+                        </span>
                     </Button>
                 )}
                 {inLibraryIndicator && isInLibrary && (
                     <DotBadge
                         className="source-manga-library-state-indicator"
-                        sx={(theme) => ({ '--status-color': theme.palette.primary.main })}
+                        sx={(theme) => ({
+                            // shrinks with an ellipsis in a narrow card instead of being cut off
+                            flexShrink: 1,
+                            minWidth: 0,
+                            '--status-color': theme.palette.primary.main,
+                        })}
                     >
-                        {t`In Library`}
+                        <span style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>{t`In Library`}</span>
                     </DotBadge>
                 )}
                 {((showUnreadBadge && mode === 'default') || mode === 'duplicate') && (unread ?? 0) > 0 && (
