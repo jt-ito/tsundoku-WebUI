@@ -12,6 +12,7 @@ import { BrowserRouter as Router } from 'react-router-dom';
 import { QueryParamProvider } from 'use-query-params';
 import { ReactRouter6Adapter } from 'use-query-params/adapters/react-router-6';
 import { SnackbarProvider } from 'notistack';
+import GlobalStyles from '@mui/material/GlobalStyles';
 import { I18nProvider } from '@lingui/react';
 import { ActiveDeviceContextProvider } from '@/features/device/DeviceContext.tsx';
 import { AppHotkeysProvider } from '@/features/hotkeys/AppHotkeysProvider.tsx';
@@ -35,7 +36,22 @@ export const AppContext: React.FC<Props> = ({ children }) => (
                         <NavBarContextProvider>
                             <AppPageHistoryContextProvider>
                                 <ActiveDeviceContextProvider>
+                                    <GlobalStyles
+                                        styles={{
+                                            // a floating button in the same corner raises the toasts (see useToastBottomOffset)
+                                            '.app-toast-container': {
+                                                bottom: 'var(--toast-bottom, 14px) !important',
+                                                transition: 'bottom 150ms cubic-bezier(0.23, 1, 0.32, 1)',
+                                            },
+                                        }}
+                                    />
                                     <SnackbarProvider
+                                        classes={{ containerAnchorOriginBottomRight: 'app-toast-container' }}
+                                        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+                                        autoHideDuration={4000}
+                                        // the timer stops while the window is not focused (another window or an iframe has
+                                        // the focus), which left a toast on screen until it was closed by hand
+                                        disableWindowBlurListener
                                         Components={{
                                             default: SnackbarWithDescription,
                                             info: SnackbarWithDescription,

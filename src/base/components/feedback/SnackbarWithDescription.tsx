@@ -20,6 +20,7 @@ import { useLingui } from '@lingui/react/macro';
 import { msg } from '@lingui/core/macro';
 import { defaultPromiseErrorHandler } from '@/lib/DefaultPromiseErrorHandler.ts';
 import { MediaQuery } from '@/base/utils/MediaQuery.tsx';
+import { getAlertSurfaceSx } from '@/base/components/feedback/AlertSurface.ts';
 import { extractGraphqlExceptionInfo } from '@/lib/HelperFunctions.ts';
 import { Confirmation } from '@/base/AppAwaitableComponent.ts';
 
@@ -55,7 +56,10 @@ export const SnackbarWithDescription = memo(
 
         const { isGraphqlException, graphqlError, graphqlStackTrace } = extractGraphqlExceptionInfo(description);
 
-        const finalDescription = isGraphqlException ? graphqlError : description;
+        // "Exception while fetching data (/updateCategory) : the reason": the reason is what the user needs to read
+        const finalDescription = isGraphqlException
+            ? graphqlError?.replace(/^.*?Exception while fetching data \(.*?\) : /s, '')
+            : description;
         const isDescriptionTooLong = (finalDescription?.length ?? 0) > MAX_DESCRIPTION_LENGTH;
         const actualDescription = isDescriptionTooLong
             ? finalDescription?.slice(0, MAX_DESCRIPTION_LENGTH)
@@ -69,19 +73,22 @@ export const SnackbarWithDescription = memo(
                     elevation={1}
                     severity={severity}
                     action={finalAction}
-                    sx={{
-                        wordBreak: 'break-word',
-                        minWidth: '300px',
-                        [theme.breakpoints.down(MediaQuery.MOBILE_WIDTH)]: {
-                            maxWidth: '100vw',
+                    sx={[
+                        getAlertSurfaceSx(severity),
+                        {
+                            wordBreak: 'break-word',
+                            minWidth: '300px',
+                            [theme.breakpoints.down(MediaQuery.MOBILE_WIDTH)]: {
+                                maxWidth: '100vw',
+                            },
+                            [theme.breakpoints.between(MediaQuery.MOBILE_WIDTH, MediaQuery.TABLET_WIDTH)]: {
+                                maxWidth: '75vw',
+                            },
+                            [theme.breakpoints.up(MediaQuery.TABLET_WIDTH)]: {
+                                maxWidth: '50vw',
+                            },
                         },
-                        [theme.breakpoints.between(MediaQuery.MOBILE_WIDTH, MediaQuery.TABLET_WIDTH)]: {
-                            maxWidth: '75vw',
-                        },
-                        [theme.breakpoints.up(MediaQuery.TABLET_WIDTH)]: {
-                            maxWidth: '50vw',
-                        },
-                    }}
+                    ]}
                     onClose={() => closeSnackbar(id)}
                 >
                     <Box

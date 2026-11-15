@@ -10,8 +10,11 @@ import KeyboardArrowDown from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUp from '@mui/icons-material/KeyboardArrowUp';
 import { useLingui } from '@lingui/react/macro';
 import { useEffect, useState } from 'react';
+import useMediaQuery from '@mui/material/useMediaQuery';
 import type { Theme } from '@mui/material/styles';
+import { useTheme } from '@mui/material/styles';
 import { DEFAULT_FAB_STYLE, StyledFab } from '@/base/components/buttons/StyledFab.tsx';
+import { useToastBottomOffset } from '@/base/hooks/useToastBottomOffset.ts';
 import { useNavBarContext } from '@/features/navigation-bar/NavbarContext.tsx';
 import { useMetadataServerSettings } from '@/features/settings/services/ServerSettingsMetadata.ts';
 
@@ -40,6 +43,7 @@ const scrollTo = (target: 'top' | 'bottom') => {
 /** One FAB that jumps to the top when in the lower half of the page, otherwise to the bottom. */
 export const LibraryScrollFab = ({ contentKey, isRaised }: { contentKey: unknown; isRaised?: boolean }) => {
     const { t } = useLingui();
+    const appTheme = useTheme();
     const { bottomBarHeight } = useNavBarContext();
     const {
         settings: { splitScrollButtons },
@@ -80,6 +84,29 @@ export const LibraryScrollFab = ({ contentKey, isRaised }: { contentKey: unknown
             window.removeEventListener('resize', update);
         };
     }, [contentKey]);
+
+    // The toasts appear in the same corner and stay out of the way of the buttons: they only move up while a button is
+    // shown and can be pressed (not faded out, not disabled at the very top / bottom), and as soon as it is again
+    const isMobile = useMediaQuery(appTheme.breakpoints.down('md'));
+    const fabSize = parseInt(DEFAULT_FAB_STYLE.height, 10);
+    let scrollButtonsHeight = 0;
+    if (target && isVisible) {
+        if (!splitScrollButtons) {
+            scrollButtonsHeight = fabSize;
+        } else if (!position.atTop) {
+            scrollButtonsHeight = SMALL_FAB_SIZE * 2 + SPLIT_FAB_GAP;
+        } else if (!position.atBottom) {
+            scrollButtonsHeight = SMALL_FAB_SIZE;
+        }
+    }
+    // the selection button is below the scroll buttons while it is shown, with a gap of 16px between them
+    const reservedHeight = isRaised
+        ? fabSize + (scrollButtonsHeight ? 16 + scrollButtonsHeight : 0)
+        : scrollButtonsHeight;
+    const toastBottom = reservedHeight
+        ? `calc(${isMobile ? `${bottomBarHeight}px + env(safe-area-inset-bottom) + 16px` : DEFAULT_FAB_STYLE.bottom} + ${reservedHeight}px + 12px)`
+        : null;
+    useToastBottomOffset(toastBottom);
 
     if (!target) {
         return null;
