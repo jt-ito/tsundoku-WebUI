@@ -131,7 +131,13 @@ export const NumberSetting = ({
                     }}
                 />
             </ListItemButton>
-            <Dialog open={isDialogOpen} onClose={cancel}>
+            <Dialog
+                open={isDialogOpen}
+                onClose={cancel}
+                // no scale-in animation: iOS places the caret while the dialog is still animating and leaves it a few
+                // pixels off (a gap behind the last digit) until the field is tapped again
+                transitionDuration={0}
+            >
                 <DialogTitle>{dialogTitle}</DialogTitle>
                 <DialogContent>
                     {(!!dialogDescription || !!dialogDisclaimer) && (

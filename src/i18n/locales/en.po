@@ -4344,6 +4344,10 @@ msgstr "the categories {0}"
 msgid "The category is empty"
 msgstr "The category is empty"
 
+#: src/features/category/components/CreateOrEditCategoryDialog.tsx
+msgid "The category needs a name."
+msgstr "The category needs a name."
+
 #: src/features/settings/Settings.constants.ts
 msgid "The login will be handled by the client."
 msgstr "The login will be handled by the client."
