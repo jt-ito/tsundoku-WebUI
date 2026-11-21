@@ -14,6 +14,7 @@ import Menu from '@mui/material/Menu';
 import DownloadIcon from '@mui/icons-material/Download';
 import DoneAllIcon from '@mui/icons-material/DoneAll';
 import { useMemo } from 'react';
+import { useSavedChapters } from '@/features/offline/OfflineStorage.ts';
 import { useLingui } from '@lingui/react/macro';
 import { CustomTooltip } from '@/base/components/CustomTooltip.tsx';
 import { ChapterOptions } from '@/features/chapter/components/ChapterOptions.tsx';
@@ -56,7 +57,12 @@ export const ChaptersToolbarMenu = ({
     const isFiltered = isFilterActive({ ...options, includedScanlators: [], excludedScanlators: [] });
 
     const areAllChaptersRead = useMemo(() => chapters.every(Chapters.isRead), [chapters]);
-    const areAllChaptersDownloaded = useMemo(() => chapters.every(Chapters.isDownloaded), [chapters]);
+    const savedChapters = useSavedChapters();
+    // chapters that are on the server can still be saved on the device
+    const areAllChaptersDownloaded = useMemo(
+        () => chapters.every((chapter) => Chapters.isDownloaded(chapter) && !!savedChapters[chapter.id]),
+        [chapters, savedChapters],
+    );
 
     return (
         <>

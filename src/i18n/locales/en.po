@@ -149,6 +149,11 @@ msgstr "{0, plural, one {Saving the chapter on this device...} other {Saving # c
 msgid "{0, plural, one {Second} other {Seconds}}"
 msgstr "{0, plural, one {Second} other {Seconds}}"
 
+#. placeholder {0}: chaptersForDeviceLater.length
+#: src/features/manga/services/Mangas.ts
+msgid "{0, plural, one {The chapter is saved on this device once the server has downloaded it} other {# chapters are saved on this device once the server has downloaded them}}"
+msgstr "{0, plural, one {The chapter is saved on this device once the server has downloaded it} other {# chapters are saved on this device once the server has downloaded them}}"
+
 #. placeholder {0}: searchProgress.completed
 #. placeholder {1}: searchProgress.total
 #: src/features/migration/screens/MigrationSearch.tsx
@@ -838,6 +843,7 @@ msgstr "Bookmark selected"
 msgid "Bookmarked"
 msgstr "Bookmarked"
 
+#: src/features/chapter/components/actions/ChaptersDownloadActionMenuItems.tsx
 #: src/features/reader/settings/layout/components/ReaderSettingTapZoneInvertMode.tsx
 msgid "Both"
 msgstr "Both"
@@ -1864,6 +1870,10 @@ msgstr "Download new chapters"
 #: src/features/chapter/Chapter.constants.ts
 msgid "Download selected"
 msgstr "Download selected"
+
+#: src/features/chapter/components/actions/ChaptersDownloadActionMenuItems.tsx
+msgid "Download to"
+msgstr "Download to"
 
 #: src/features/chapter/components/cards/ChapterCard.tsx
 #: src/features/chapter/components/ChapterOptions.tsx
@@ -4022,6 +4032,7 @@ msgstr "Sepia"
 msgid "Series settings"
 msgstr "Series settings"
 
+#: src/features/chapter/components/actions/ChaptersDownloadActionMenuItems.tsx
 #: src/features/downloads/components/DownloadLocationLabels.tsx
 #: src/features/settings/screens/About.tsx
 #: src/features/settings/screens/ServerSettings.tsx
@@ -4635,6 +4646,7 @@ msgstr "Third to last read chapter"
 msgid "This browser cannot save chapters on the device"
 msgstr "This browser cannot save chapters on the device"
 
+#: src/features/chapter/components/actions/ChaptersDownloadActionMenuItems.tsx
 #: src/features/downloads/components/DownloadLocationLabels.tsx
 msgid "This device"
 msgstr "This device"

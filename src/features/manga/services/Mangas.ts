@@ -7,7 +7,7 @@
  */
 
 import type { DocumentNode, Unmasked } from '@apollo/client';
-import { t } from '@lingui/core/macro';
+import { plural, t } from '@lingui/core/macro';
 import { i18n } from '@/i18n';
 import { requestManager } from '@/lib/requests/RequestManager.ts';
 import type {
@@ -61,6 +61,9 @@ import { GET_MANGAS_CHAPTER_IDS_WITH_STATE } from '@/lib/graphql/chapter/Chapter
 import { filterChapters } from '@/features/chapter/utils/ChapterList.util.tsx';
 import mapValues from 'lodash/fp/mapValues';
 import { getMangaMetadata } from '@/features/manga/services/MangaMetadata.ts';
+import { DownloadDestination } from '@/features/downloads/Downloads.types.ts';
+import { OfflineChapters } from '@/features/offline/OfflineChapters.ts';
+import { OfflineStorage } from '@/features/offline/OfflineStorage.ts';
 
 const I18N_PLURAL = 9999;
 
@@ -68,6 +71,8 @@ type DownloadChaptersOptions = {
     size?: number;
     onlyUnread?: boolean;
     downloadAhead?: boolean;
+    /** default: the server */
+    destination?: DownloadDestination;
 };
 type MarkAsReadOptions = { wasManuallyMarkedAsRead: boolean };
 type ChangeCategoriesOptions = { changeCategoriesPatch: UpdateMangaCategoriesPatchInput };
@@ -223,7 +228,12 @@ export class Mangas {
 
     static async downloadChapters(
         mangaIds: number[],
-        { size, onlyUnread, downloadAhead = false }: DownloadChaptersOptions = {},
+        {
+            size,
+            onlyUnread,
+            downloadAhead = false,
+            destination = DownloadDestination.SERVER,
+        }: DownloadChaptersOptions = {},
         disableConfirmation?: boolean,
     ): Promise<void> {
         return Mangas.executeAction(
@@ -239,17 +249,26 @@ export class Mangas {
                     (manga) => manga.id,
                 );
 
+                // a chapter is done when it is where it was asked to go: on the server, on the device, or (for both) on either of
+                // them: the next chapters are the ones that are in neither place
+                const isDone = ({ id, isDownloaded }: { id: number; isDownloaded: boolean }) => {
+                    if (destination === DownloadDestination.SERVER) {
+                        return isDownloaded;
+                    }
+                    const isSaved = OfflineStorage.isChapterSaved(id);
+
+                    return destination === DownloadDestination.DEVICE ? isSaved : isDownloaded || isSaved;
+                };
+                const getChapters = async (isRead: boolean | undefined, wantsDone: boolean) =>
+                    destination === DownloadDestination.SERVER
+                        ? Mangas.getChapterIdsWithState(mangaIds, { isRead, isDownloaded: wantsDone })
+                        : (await Mangas.getChapterIdsWithState(mangaIds, { isRead })).filter(
+                              (chapter) => isDone(chapter) === wantsDone,
+                          );
+
                 const [chaptersToConsider, unReadDownloadedChapters] = await Promise.all([
-                    Mangas.getChapterIdsWithState(mangaIds, {
-                        isRead: onlyUnread ? false : undefined,
-                        isDownloaded: false,
-                    }),
-                    downloadAhead
-                        ? Mangas.getChapterIdsWithState(mangaIds, {
-                              isRead: false,
-                              isDownloaded: true,
-                          })
-                        : [],
+                    getChapters(onlyUnread ? false : undefined, false),
+                    downloadAhead ? getChapters(false, true) : [],
                 ]);
 
                 const chaptersToConsiderByMangaId = Object.groupBy(chaptersToConsider, (chapter) => chapter.mangaId);
@@ -294,34 +313,69 @@ export class Mangas {
                     Object.fromEntries([...mangaIdToDefaultDownloadSize, ...mangaIdToDownloadSize]),
                 ) satisfies MangaIdToDownloadSize[];
 
-                const chaptersToDownload = mangaIdToActualDownloadSize
-                    .flatMap(([mangaId, actualSize]) => {
-                        const mangaChapters = filteredChaptersToConsiderByMangaId[Number(mangaId)] ?? [];
+                const chaptersToDownload = mangaIdToActualDownloadSize.flatMap(([mangaId, actualSize]) => {
+                    const mangaChapters = filteredChaptersToConsiderByMangaId[Number(mangaId)] ?? [];
 
-                        if (!mangaChapters.length) {
-                            return [];
-                        }
+                    if (!mangaChapters.length) {
+                        return [];
+                    }
 
-                        const shouldDownloadAll = actualSize === undefined;
-                        if (shouldDownloadAll) {
-                            return mangaChapters;
-                        }
+                    const shouldDownloadAll = actualSize === undefined;
+                    if (shouldDownloadAll) {
+                        return mangaChapters;
+                    }
 
-                        const uniqueMangaChapters = Chapters.removeDuplicates(mangaChapters[0], mangaChapters);
-                        const uniqueMangaChaptersToDownload = uniqueMangaChapters.slice(0, actualSize);
+                    const uniqueMangaChapters = Chapters.removeDuplicates(mangaChapters[0], mangaChapters);
+                    const uniqueMangaChaptersToDownload = uniqueMangaChapters.slice(0, actualSize);
 
-                        return Chapters.addDuplicates(uniqueMangaChaptersToDownload, mangaChapters);
-                    })
-                    .filter(Chapters.isDownloadable);
+                    return Chapters.addDuplicates(uniqueMangaChaptersToDownload, mangaChapters);
+                });
 
-                if (!chaptersToDownload.length) {
-                    return Promise.resolve();
+                const chaptersForServer =
+                    destination === DownloadDestination.DEVICE
+                        ? []
+                        : chaptersToDownload.filter(Chapters.isDownloadable);
+                const chaptersForDevice =
+                    destination === DownloadDestination.SERVER
+                        ? []
+                        : chaptersToDownload.filter(({ id }) => !OfflineStorage.isChapterSaved(id));
+                // On both: what the server does not have yet is saved on the device once the server has it, so the
+                // source is only asked once.
+                const chaptersForDeviceNow =
+                    destination === DownloadDestination.BOTH
+                        ? chaptersForDevice.filter((chapter) => chapter.isDownloaded)
+                        : chaptersForDevice;
+                const chaptersForDeviceLater =
+                    destination === DownloadDestination.BOTH
+                        ? chaptersForDevice.filter((chapter) => !chapter.isDownloaded)
+                        : [];
+
+                if (chaptersForServer.length) {
+                    try {
+                        await Chapters.download(Chapters.getIds(chaptersForServer), disableConfirmation);
+                    } catch (e) {
+                        // Ignore - Error gets handled in Chapters
+                    }
                 }
 
-                try {
-                    await Chapters.download(Chapters.getIds(chaptersToDownload), disableConfirmation);
-                } catch (e) {
-                    // Ignore - Error gets handled in Chapters
+                if (chaptersForDeviceLater.length) {
+                    // in the background: the queue of the server can take a long time
+                    OfflineChapters.saveWhenDownloaded(chaptersForDeviceLater).catch(() => {});
+                    makeToast(
+                        plural(chaptersForDeviceLater.length, {
+                            one: 'The chapter is saved on this device once the server has downloaded it',
+                            other: '# chapters are saved on this device once the server has downloaded them',
+                        }),
+                        'info',
+                    );
+                }
+
+                if (chaptersForDeviceNow.length) {
+                    try {
+                        await OfflineChapters.save(chaptersForDeviceNow);
+                    } catch (e) {
+                        // Ignore - Error gets handled in OfflineChapters
+                    }
                 }
             },
             true,
@@ -506,12 +560,17 @@ export class Mangas {
             downloadAhead,
             onlyUnread,
             size,
+            destination,
         }: PerformActionOptions<Action>,
         disableConfirmation?: boolean,
     ): Promise<void> {
         switch (action) {
             case 'download':
-                return Mangas.downloadChapters(mangaIds, { downloadAhead, onlyUnread, size }, disableConfirmation);
+                return Mangas.downloadChapters(
+                    mangaIds,
+                    { downloadAhead, onlyUnread, size, destination },
+                    disableConfirmation,
+                );
             case 'delete':
                 return Mangas.deleteChapters(mangaIds, disableConfirmation);
             case 'mark_as_read':

@@ -26,3 +26,10 @@ export enum DownloadedChaptersSort {
     RECENTLY_ADDED = 'recentlyAdded',
     MANGA_TITLE = 'mangaTitle',
 }
+
+/** Where chapters are downloaded to: the server, this device (to read without the server), or both. */
+export enum DownloadDestination {
+    SERVER = 'server',
+    DEVICE = 'device',
+    BOTH = 'both',
+}

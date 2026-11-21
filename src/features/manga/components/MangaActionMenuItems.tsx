@@ -14,6 +14,7 @@ import Done from '@mui/icons-material/Done';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import Label from '@mui/icons-material/Label';
 import { useMemo, useState } from 'react';
+import { OfflineStorage, useSavedChapters } from '@/features/offline/OfflineStorage.ts';
 import SyncAltIcon from '@mui/icons-material/SyncAlt';
 import SyncIcon from '@mui/icons-material/Sync';
 import Dialog from '@mui/material/Dialog';
@@ -82,7 +83,22 @@ export const MangaActionMenuItems = ({
     const shouldShowMenuItem = createShouldShowMenuItem(isSingleMode);
     const isMenuItemDisabled = createIsMenuItemDisabled(isSingleMode);
 
-    const isDownloadable = !!manga && !!manga.chapters.totalCount && !Mangas.isFullyDownloaded(manga);
+    // a manga can still be downloaded while some chapters are missing on the server, or on the device if it can save them
+    const savedChapters = useSavedChapters();
+    const savedCountByMangaId = useMemo(() => {
+        const counts: Record<number, number> = {};
+        Object.values(savedChapters).forEach(({ mangaId }) => {
+            counts[mangaId] = (counts[mangaId] ?? 0) + 1;
+        });
+        return counts;
+    }, [savedChapters]);
+    const canSaveOnDevice = OfflineStorage.isSupported();
+    const isDownloadableManga = (candidate: MangaDownloadInfo & MangaIdInfo): boolean =>
+        candidate.chapters.totalCount > 0 &&
+        (!Mangas.isFullyDownloaded(candidate) ||
+            (canSaveOnDevice && (savedCountByMangaId[candidate.id] ?? 0) < candidate.chapters.totalCount));
+
+    const isDownloadable = !!manga && isDownloadableManga(manga);
     const hasDownloadedChapters = manga && Mangas.isPartiallyDownloaded(manga);
     const hasUnreadChapters = manga && !!manga.chapters.totalCount && !Mangas.isFullyRead(manga);
     const hasReadChapters = !!manga && Mangas.isPartiallyRead(manga);
@@ -100,12 +116,8 @@ export const MangaActionMenuItems = ({
         onClose();
     };
 
-    const { downloadableMangas, downloadedMangas, unreadMangas, readMangas } = useMemo(
+    const { downloadedMangas, unreadMangas, readMangas } = useMemo(
         () => ({
-            downloadableMangas: [
-                ...Mangas.getNotDownloaded(selectedMangas),
-                ...Mangas.getPartiallyDownloaded(selectedMangas),
-            ],
             downloadedMangas: [
                 ...Mangas.getPartiallyDownloaded(selectedMangas),
                 ...Mangas.getFullyDownloaded(selectedMangas),
@@ -115,6 +127,7 @@ export const MangaActionMenuItems = ({
         }),
         [selectedMangas],
     );
+    const downloadableMangas = selectedMangas.filter(isDownloadableManga);
 
     return (
         <>
