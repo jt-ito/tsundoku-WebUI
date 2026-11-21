@@ -12,3 +12,17 @@ export type MetadataDownloadSettings = {
     deleteChaptersWithBookmark: boolean;
     downloadAheadLimit: number;
 };
+
+export enum DownloadsTab {
+    QUEUE = 'queue',
+    DOWNLOADED = 'downloaded',
+}
+
+/** How the chapters that were downloaded (to the server or the device) are ordered on the Downloads page. */
+export enum DownloadedChaptersSort {
+    RECENTLY_READ = 'recentlyRead',
+    NEWEST_CHAPTERS = 'newestChapters',
+    OLDEST_CHAPTERS = 'oldestChapters',
+    RECENTLY_ADDED = 'recentlyAdded',
+    MANGA_TITLE = 'mangaTitle',
+}

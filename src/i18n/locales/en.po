@@ -19,10 +19,16 @@ msgstr ""
 msgid "— State: {0}"
 msgstr "— State: {0}"
 
+#. placeholder {0}: deviceIds.length
+#: src/features/downloads/screens/DownloadedChapters.tsx
+msgid "{0, plural, one {# chapter will be removed from this device.} other {# chapters will be removed from this device.}}"
+msgstr "{0, plural, one {# chapter will be removed from this device.} other {# chapters will be removed from this device.}}"
+
 #. placeholder {0}: Chapters.getUniqueCount(visibleChapters)
 #. placeholder {0}: Object.keys(savedChapters).length
 #. placeholder {0}: chapterIds.length
 #: src/features/chapter/components/ChapterList.tsx
+#: src/features/downloads/screens/DownloadedChapters.tsx
 #: src/features/offline/screens/OfflineStorageSettings.tsx
 msgid "{0, plural, one {# chapter} other {# chapters}}"
 msgstr "{0, plural, one {# chapter} other {# chapters}}"
@@ -36,6 +42,11 @@ msgstr "{0, plural, one {# Chapter} other {# Chapters}}"
 #: src/features/backup/screens/Backup.tsx
 msgid "{0, plural, one {# day} other {# days}}"
 msgstr "{0, plural, one {# day} other {# days}}"
+
+#. placeholder {0}: serverIds.length
+#: src/features/downloads/screens/DownloadedChapters.tsx
+msgid "{0, plural, one {# download will be deleted from the server.} other {# downloads will be deleted from the server.}}"
+msgstr "{0, plural, one {# download will be deleted from the server.} other {# downloads will be deleted from the server.}}"
 
 #. placeholder {0}: selectedItemIds.length
 #: src/features/library/screens/Library.tsx
@@ -53,6 +64,11 @@ msgstr "{0, plural, one {# minute} other {# minutes}}"
 #: src/features/settings/screens/ServerSettings.tsx
 msgid "{0, plural, one {# second} other {# seconds}}"
 msgstr "{0, plural, one {# second} other {# seconds}}"
+
+#. placeholder {0}: selectedItemIds.length
+#: src/features/downloads/screens/DownloadedChapters.tsx
+msgid "{0, plural, one {# selected} other {# selected}}"
+msgstr "{0, plural, one {# selected} other {# selected}}"
 
 #. placeholder {0}: serverSettings.maxSourcesInParallel
 #: src/features/browse/screens/BrowseSettings.tsx
@@ -616,6 +632,7 @@ msgstr "Are you sure you want to abort the migration?"
 #: src/features/authentication/components/UserAccountsDialog.tsx
 #: src/features/category/components/CategorySettingsCard.tsx
 #: src/features/chapter/services/Chapters.ts
+#: src/features/downloads/screens/DownloadedChapters.tsx
 #: src/features/extension/store/screens/ExtensionStores.tsx
 #: src/features/manga/hooks/useManageMangaLibraryState.tsx
 #: src/features/manga/services/Mangas.ts
@@ -920,6 +937,7 @@ msgstr "Can't migrate an entry to itself"
 #: src/features/category/components/CategorySelect.tsx
 #: src/features/category/components/CreateOrEditCategoryDialog.tsx
 #: src/features/downloads/components/DownloadQueueChapterCard.tsx
+#: src/features/downloads/screens/DownloadedChapters.tsx
 #: src/features/library/screens/LibraryShare.tsx
 #: src/features/manga/components/details/MangaNotes.tsx
 #: src/features/migration/components/MigrationBulkSearchOptionsDialog.tsx
@@ -1024,6 +1042,7 @@ msgstr "Channel"
 
 #: src/features/chapter/components/cards/ChapterCard.tsx
 #: src/features/downloads/components/DownloadAheadSetting.tsx
+#: src/features/downloads/components/SavedChapterCard.tsx
 #: src/features/downloads/screens/DownloadSettings.tsx
 #: src/features/migration/components/MigrationOptionsDialog.tsx
 #: src/features/reader/overlay/navigation/desktop/components/ReaderNavBarDesktopChapterNavigation.tsx
@@ -1842,17 +1861,13 @@ msgstr "Download location"
 msgid "Download new chapters"
 msgstr "Download new chapters"
 
-#: src/features/downloads/screens/DownloadQueue.tsx
-#: src/features/navigation-bar/NavigationBar.constants.ts
-msgid "Download queue"
-msgstr "Download queue"
-
 #: src/features/chapter/Chapter.constants.ts
 msgid "Download selected"
 msgstr "Download selected"
 
 #: src/features/chapter/components/cards/ChapterCard.tsx
 #: src/features/chapter/components/ChapterOptions.tsx
+#: src/features/downloads/screens/Downloads.tsx
 #: src/features/library/components/LibraryOptionsPanel.tsx
 msgid "Downloaded"
 msgstr "Downloaded"
@@ -1862,6 +1877,7 @@ msgstr "Downloaded"
 msgid "Downloading"
 msgstr "Downloading"
 
+#: src/features/downloads/screens/Downloads.tsx
 #: src/features/downloads/screens/DownloadSettings.tsx
 #: src/features/navigation-bar/NavigationBar.constants.ts
 #: src/features/settings/screens/Settings.tsx
@@ -2818,6 +2834,7 @@ msgstr "Manage your existing devices.\n"
 "UI specific settings that are stored on the server are per device.\n"
 "This makes it possible to have e.g. different settings on a desktop and a smartphone"
 
+#: src/features/downloads/components/SavedChapterCard.tsx
 #: src/features/manga/screens/Manga.tsx
 #: src/features/offline/screens/OfflineStorageSettings.tsx
 #: src/features/reader/settings/behaviour/components/ReaderSettingExitMode.tsx
@@ -2838,6 +2855,10 @@ msgstr "Manga item width"
 #: src/features/settings/screens/Appearance.tsx
 msgid "Manga thumbnail as background"
 msgstr "Manga thumbnail as background"
+
+#: src/features/downloads/Downloads.constants.ts
+msgid "Manga title"
+msgstr "Manga title"
 
 #: src/features/tracker/Tracker.constants.ts
 msgid "Manhua"
@@ -3081,6 +3102,10 @@ msgstr "New chapters available: {newChapterCount} across {mangaCount} manga"
 msgid "New chapters in {categoryName}: {newChapterCount} across {mangaCount} manga"
 msgstr "New chapters in {categoryName}: {newChapterCount} across {mangaCount} manga"
 
+#: src/features/downloads/Downloads.constants.ts
+msgid "Newest chapters"
+msgstr "Newest chapters"
+
 #: src/features/reader/tap-zones/ReaderTapZone.constants.ts
 msgid "Next"
 msgstr "Next"
@@ -3172,6 +3197,10 @@ msgstr "Notes"
 msgid "Notes saved"
 msgstr "Notes saved"
 
+#: src/features/downloads/screens/DownloadedChapters.tsx
+msgid "Nothing downloaded yet"
+msgstr "Nothing downloaded yet"
+
 #: src/features/library/screens/LibraryShare.tsx
 msgid "Nothing is added to your library until you accept"
 msgstr "Nothing is added to your library until you accept"
@@ -3212,7 +3241,10 @@ msgstr "Obsolete"
 msgid "OEL"
 msgstr "OEL"
 
+#: src/features/downloads/screens/DownloadedChapters.tsx
+#: src/features/downloads/screens/DownloadQueue.tsx
 #: src/features/offline/screens/OfflineStorageSettings.tsx
+#: src/features/settings/screens/More.tsx
 #: src/features/settings/screens/Settings.tsx
 msgid "Offline storage"
 msgstr "Offline storage"
@@ -3252,6 +3284,10 @@ msgstr "Offset double spreads"
 #: src/features/tracker/components/cards/TrackerActiveCard.tsx
 msgid "Ok"
 msgstr "Ok"
+
+#: src/features/downloads/Downloads.constants.ts
+msgid "Oldest chapters"
+msgstr "Oldest chapters"
 
 #: src/features/library/screens/LibrarySettings.tsx
 msgid "On touch screens, swiping the library sideways moves to the next or previous category"
@@ -3492,6 +3528,10 @@ msgstr "Pure black dark mode"
 msgid "px"
 msgstr "px"
 
+#: src/features/downloads/screens/Downloads.tsx
+msgid "Queue"
+msgstr "Queue"
+
 #: src/base/components/downloads/DownloadStateIndicatorCircular.tsx
 msgid "Queued"
 msgstr "Queued"
@@ -3531,10 +3571,12 @@ msgstr "Reading mode"
 msgid "Recent searches"
 msgstr "Recent searches"
 
+#: src/features/downloads/Downloads.constants.ts
 #: src/features/library/components/LibraryOptionsPanel.tsx
 msgid "Recently added"
 msgstr "Recently added"
 
+#: src/features/downloads/Downloads.constants.ts
 #: src/features/library/components/LibraryOptionsPanel.tsx
 msgid "Recently read"
 msgstr "Recently read"
@@ -3573,6 +3615,7 @@ msgid "Remind later"
 msgstr "Remind later"
 
 #: src/base/components/settings/DateSetting.tsx
+#: src/features/downloads/screens/DownloadedChapters.tsx
 #: src/features/library/screens/LibraryShare.tsx
 #: src/features/manga/hooks/useManageMangaLibraryState.tsx
 #: src/features/offline/screens/OfflineStorageSettings.tsx
@@ -3607,11 +3650,25 @@ msgstr "Remove everything from this device?"
 msgid "Remove from the library"
 msgstr "Remove from the library"
 
+#. placeholder {0}: serverChapterIds.length
+#: src/features/downloads/screens/DownloadedChapters.tsx
+msgid "Remove from the server ({0})"
+msgstr "Remove from the server ({0})"
+
+#: src/features/downloads/screens/DownloadedChapters.tsx
+msgid "Remove from the server and this device"
+msgstr "Remove from the server and this device"
+
 #: src/features/authentication/components/UserAccountsDialog.tsx
 #: src/features/chapter/components/actions/ChapterActionMenuItems.tsx
 #: src/features/offline/screens/OfflineStorageSettings.tsx
 msgid "Remove from this device"
 msgstr "Remove from this device"
+
+#. placeholder {0}: deviceChapterIds.length
+#: src/features/downloads/screens/DownloadedChapters.tsx
+msgid "Remove from this device ({0})"
+msgstr "Remove from this device ({0})"
 
 #: src/features/library/screens/LibrarySettings.tsx
 msgid "Remove manga from categories when removing them from the library"
@@ -3897,6 +3954,7 @@ msgstr "See the official <0>MUI documentation</0> for how to customize the theme
 
 #: src/features/chapter/components/actions/ChapterActionMenuItems.tsx
 #: src/features/chapter/components/cards/ChapterCard.tsx
+#: src/features/downloads/screens/DownloadedChapters.tsx
 #: src/features/manga/components/cards/MangaCard.tsx
 #: src/features/manga/components/MangaActionMenuItems.tsx
 #: src/features/manga/components/MangaOptionButton.tsx
@@ -3964,6 +4022,7 @@ msgstr "Sepia"
 msgid "Series settings"
 msgstr "Series settings"
 
+#: src/features/downloads/components/DownloadLocationLabels.tsx
 #: src/features/settings/screens/About.tsx
 #: src/features/settings/screens/ServerSettings.tsx
 #: src/features/settings/screens/Settings.tsx
@@ -4210,6 +4269,10 @@ msgstr "Something went wrong\n"
 #: src/features/library/components/LibraryOptionsPanel.tsx
 msgid "Sort"
 msgstr "Sort"
+
+#: src/features/downloads/screens/DownloadedChapters.tsx
+msgid "Sort by"
+msgstr "Sort by"
 
 #: src/features/browse/screens/Browse.tsx
 #: src/features/browse/screens/BrowseSettings.tsx
@@ -4525,6 +4588,10 @@ msgstr "The previous chapter has a different scanlator than the current one.\n"
 msgid "The saved chapters and the data kept for offline use are deleted from this device. Nothing changes on the server."
 msgstr "The saved chapters and the data kept for offline use are deleted from this device. Nothing changes on the server."
 
+#: src/features/downloads/screens/DownloadedChapters.tsx
+msgid "The server cannot be reached: showing what is saved on this device."
+msgstr "The server cannot be reached: showing what is saved on this device."
+
 #: src/features/theme/components/CreateThemeDialog.tsx
 msgid "The theme name must be unique and has a limit of 16 characters"
 msgstr "The theme name must be unique and has a limit of 16 characters"
@@ -4567,6 +4634,10 @@ msgstr "Third to last read chapter"
 #: src/features/offline/screens/OfflineStorageSettings.tsx
 msgid "This browser cannot save chapters on the device"
 msgstr "This browser cannot save chapters on the device"
+
+#: src/features/downloads/components/DownloadLocationLabels.tsx
+msgid "This device"
+msgstr "This device"
 
 #: src/features/browse/screens/BrowseSettings.tsx
 msgid "This does not prevent unofficial or potentially incorrectly flagged extensions from surfacing NSFW (18+) content within the app."
@@ -4712,6 +4783,7 @@ msgstr "UI Login (Recommended)"
 #: src/features/browse/sources/Sources.tsx
 #: src/features/chapter/components/ChapterList.tsx
 #: src/features/device/screens/DeviceSetting.tsx
+#: src/features/downloads/screens/DownloadedChapters.tsx
 #: src/features/downloads/screens/DownloadQueue.tsx
 #: src/features/downloads/screens/DownloadSettings.tsx
 #: src/features/extension/info/screens/ExtensionInfo.tsx

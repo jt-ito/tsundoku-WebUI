@@ -407,6 +407,7 @@ import { ImageCache } from '@/lib/service-worker/ImageCache.ts';
 import type { ReadingProgress } from '@/features/offline/OfflineStorage.ts';
 import { OfflineStorage } from '@/features/offline/OfflineStorage.ts';
 import { OfflineMode } from '@/features/offline/OfflineMode.ts';
+import { DownloadedChaptersSort } from '@/features/downloads/Downloads.types.ts';
 import { Sources } from '@/features/source/services/Sources.ts';
 import uniqBy from 'lodash/fp/uniqBy';
 import { EXTENSION_STORE_FIELDS } from '@/lib/graphql/extension/store/ExtensionStoreFragments.ts';
@@ -3836,6 +3837,43 @@ export class RequestManager {
                 });
             },
         } as typeof result;
+    }
+
+    /**
+     * The chapters that were downloaded to the server or saved on the device, with the manga they belong to.
+     *
+     * The order is the one of the server, except for "manga title": it cannot order by that, the list sorts what it has
+     * loaded.
+     */
+    public useGetDownloadedChapters(
+        sort: DownloadedChaptersSort,
+        savedChapterIds: number[],
+        options?: QueryHookOptions<GetChaptersHistoryQuery, GetChaptersHistoryQueryVariables>,
+    ): AbortableApolloUseQueryResponse<GetChaptersHistoryQuery, GetChaptersHistoryQueryVariables> {
+        const PAGE_SIZE = 150;
+
+        const sortToOrder: Record<DownloadedChaptersSort, NonNullable<GetChaptersHistoryQueryVariables['order']>> = {
+            [DownloadedChaptersSort.RECENTLY_READ]: [{ by: ChapterOrderBy.LastReadAt, byType: SortOrder.Desc }],
+            [DownloadedChaptersSort.NEWEST_CHAPTERS]: [{ by: ChapterOrderBy.UploadDate, byType: SortOrder.Desc }],
+            [DownloadedChaptersSort.OLDEST_CHAPTERS]: [{ by: ChapterOrderBy.UploadDate, byType: SortOrder.Asc }],
+            [DownloadedChaptersSort.RECENTLY_ADDED]: [{ by: ChapterOrderBy.FetchedAt, byType: SortOrder.Desc }],
+            [DownloadedChaptersSort.MANGA_TITLE]: [{ by: ChapterOrderBy.SourceOrder, byType: SortOrder.Desc }],
+        };
+
+        return this.useGetChapters<GetChaptersHistoryQuery, GetChaptersHistoryQueryVariables>(
+            GET_CHAPTERS_HISTORY,
+            {
+                filter: {
+                    or: [
+                        { isDownloaded: { equalTo: true } },
+                        ...(savedChapterIds.length ? [{ id: { in: savedChapterIds } }] : []),
+                    ],
+                },
+                order: sortToOrder[sort],
+                first: PAGE_SIZE,
+            },
+            options,
+        );
     }
 
     public startGlobalUpdate(

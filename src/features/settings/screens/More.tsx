@@ -12,6 +12,7 @@ import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import ListAltIcon from '@mui/icons-material/ListAlt';
+import OfflinePinIcon from '@mui/icons-material/OfflinePin';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import Divider from '@mui/material/Divider';
 import { useLingui } from '@lingui/react/macro';
@@ -102,6 +103,14 @@ export const More = () => {
                                 />
                             </ListItemLink>
                             {item.path === AppRoutes.about.path && <SidebarVersionButton inline />}
+                            {item.path === AppRoutes.downloads.path && (
+                                <ListItemLink to={AppRoutes.settings.children.offline.path}>
+                                    <ListItemIcon>
+                                        <OfflinePinIcon />
+                                    </ListItemIcon>
+                                    <ListItemText primary={t`Offline storage`} />
+                                </ListItemLink>
+                            )}
                         </Fragment>
                     ))}
                     {index !== list.length - 1 && <Divider />}

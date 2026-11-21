@@ -30,7 +30,6 @@ import { DndSortableItem } from '@/lib/dnd-kit/DndSortableItem.tsx';
 import { DndKitUtil } from '@/lib/dnd-kit/DndKitUtil.ts';
 import { DndOverlayItem } from '@/lib/dnd-kit/DndOverlayItem.tsx';
 import { DownloadQueueChapterCard } from '@/features/downloads/components/DownloadQueueChapterCard.tsx';
-import { useAppTitle } from '@/features/navigation-bar/hooks/useAppTitle.ts';
 import { useAppAction } from '@/features/navigation-bar/hooks/useAppAction.ts';
 import type { ChapterDownloadStatus } from '@/features/chapter/Chapter.types.ts';
 import { VirtuosoPersisted } from '@/lib/virtuoso/Component/VirtuosoPersisted.tsx';
@@ -46,12 +45,16 @@ import { plural } from '@lingui/core/macro';
 import { Chapters } from '@/features/chapter/services/Chapters.ts';
 import Refresh from '@mui/icons-material/Refresh';
 import { useOffsetComponent } from '@/base/OffsetComponent.tsx';
+import { Link } from 'react-router-dom';
+import OfflinePinIcon from '@mui/icons-material/OfflinePin';
+import { AppRoutes } from '@/base/AppRoute.constants.ts';
+import { MediaQuery } from '@/base/utils/MediaQuery.tsx';
 
 export const DownloadQueue: React.FC = () => {
     const { t } = useLingui();
 
-    useAppTitle(t`Download queue`);
     const { topOffset } = useOffsetComponent();
+    const isMobileWidth = MediaQuery.useIsMobileWidth();
 
     const [reorderDownloadsMutation] = requestManager.useReorderChaptersInDownloadQueue();
 
@@ -228,6 +231,15 @@ export const DownloadQueue: React.FC = () => {
 
     useAppAction(
         <>
+            {/* on phones the entry is on the "More" page, under the download queue */}
+            {!isMobileWidth && (
+                <CustomTooltip title={t`Offline storage`}>
+                    <IconButton component={Link} to={AppRoutes.settings.children.offline.path} color="inherit">
+                        <OfflinePinIcon />
+                    </IconButton>
+                </CustomTooltip>
+            )}
+
             <CustomTooltip title={t`Retry all`} disabled={!failedDownloadChapterIds.length}>
                 <IconButton onClick={retryDownloads} color="inherit" disabled={!failedDownloadChapterIds.length}>
                     <Refresh />
@@ -246,7 +258,7 @@ export const DownloadQueue: React.FC = () => {
                 </IconButton>
             </CustomTooltip>
         </>,
-        [status, isQueueEmpty, failedDownloadChapterIds.length],
+        [status, isQueueEmpty, failedDownloadChapterIds.length, isMobileWidth],
     );
 
     // Virtuoso's resize observer can throw this error,

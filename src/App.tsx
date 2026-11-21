@@ -46,7 +46,7 @@ import { d } from 'koration';
 import { OffsetContainer } from '@/base/OffsetComponent.tsx';
 
 const { Browse } = loadable(() => import('@/features/browse/screens/Browse.tsx'), lazyLoadFallback);
-const { DownloadQueue } = loadable(() => import('@/features/downloads/screens/DownloadQueue.tsx'), lazyLoadFallback);
+const { Downloads } = loadable(() => import('@/features/downloads/screens/Downloads.tsx'), lazyLoadFallback);
 const { Library } = loadable(() => import('@/features/library/screens/Library.tsx'), lazyLoadFallback);
 const { Manga } = loadable(() => import('@/features/manga/screens/Manga.tsx'), lazyLoadFallback);
 const { SearchAll } = loadable(() => import('@/features/global-search/screens/SearchAll.tsx'), lazyLoadFallback);
@@ -399,7 +399,7 @@ const MainApp = () => {
                             />
                             <Route path={AppRoutes.extension.children.info.match} element={<ExtensionInfo />} />
                         </Route>
-                        <Route path={AppRoutes.downloads.match} element={<DownloadQueue />} />
+                        <Route path={AppRoutes.downloads.match} element={<Downloads />} />
                         <Route path={AppRoutes.manga.match}>
                             <Route path={AppRoutes.manga.children.reader.match} element={null} />
                             <Route index element={<Manga />} />
