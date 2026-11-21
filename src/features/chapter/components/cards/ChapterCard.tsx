@@ -7,6 +7,8 @@
  */
 
 import BookmarkIcon from '@mui/icons-material/Bookmark';
+import OfflinePinIcon from '@mui/icons-material/OfflinePin';
+import { useIsChapterSaved } from '@/features/offline/OfflineStorage.ts';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import CardActionArea from '@mui/material/CardActionArea';
 import Checkbox from '@mui/material/Checkbox';
@@ -95,6 +97,7 @@ export const ChapterCard = memo((props: IProps) => {
     const isSelecting = selected !== null;
 
     const { isDownloaded } = chapter;
+    const isSavedToDevice = useIsChapterSaved(chapter.id);
 
     const handleClick = (event: MouseEvent | TouchEvent) => {
         if (!isSelecting) {
@@ -152,10 +155,29 @@ export const ChapterCard = memo((props: IProps) => {
                                         isDownloaded ? ` — ${t`Downloaded`}` : ''
                                     }`}
                                     infoIcons={
-                                        chapter.isBookmarked && (
-                                            <BookmarkIcon
-                                                color={mode === 'reader' && isActiveChapter ? 'secondary' : 'primary'}
-                                            />
+                                        (chapter.isBookmarked || isSavedToDevice) && (
+                                            <>
+                                                {isSavedToDevice && (
+                                                    <CustomTooltip title={t`Saved on this device`}>
+                                                        <OfflinePinIcon
+                                                            color={
+                                                                mode === 'reader' && isActiveChapter
+                                                                    ? 'secondary'
+                                                                    : 'primary'
+                                                            }
+                                                        />
+                                                    </CustomTooltip>
+                                                )}
+                                                {chapter.isBookmarked && (
+                                                    <BookmarkIcon
+                                                        color={
+                                                            mode === 'reader' && isActiveChapter
+                                                                ? 'secondary'
+                                                                : 'primary'
+                                                        }
+                                                    />
+                                                )}
+                                            </>
                                         )
                                     }
                                     slotProps={{

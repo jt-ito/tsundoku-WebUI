@@ -82,8 +82,31 @@ export default defineConfig(({ command }) => ({
                 enabled: true,
             },
             workbox: {
-                globPatterns: [],
+                // The app itself is kept on the device, so it opens without a connection to the server
+                globPatterns: ['**/*.{js,css,html,svg,png,ico,woff2,webmanifest}'],
+                // the legacy builds are only for old browsers, which do not run this service worker anyway
+                globIgnores: ['**/*-legacy-*.js', '**/polyfills-legacy-*.js'],
+                maximumFileSizeToCacheInBytes: 8 * 1024 * 1024,
+                cleanupOutdatedCaches: true,
+                // the plugin would answer every page request with the saved page, even when the server can be reached
+                navigateFallback: null,
                 runtimeCaching: [
+                    {
+                        // Every url of the app opens the same page. The server is asked first (it may redirect, e.g. to
+                        // the setup of the first login), the saved app only answers when it cannot be reached.
+                        urlPattern: ({ request }: { request: Request }) => request.mode === 'navigate',
+                        handler: 'NetworkFirst',
+                        options: {
+                            cacheName: 'app-pages',
+                            networkTimeoutSeconds: 3,
+                            plugins: [
+                                {
+                                    // the precached page is stored with a revision in its url
+                                    handlerDidError: async () => caches.match('index.html', { ignoreSearch: true }),
+                                },
+                            ],
+                        },
+                    },
                     createCacheFirstRuntimeCache({
                         urlPattern: ({ url }) => {
                             const { pathname } = url;

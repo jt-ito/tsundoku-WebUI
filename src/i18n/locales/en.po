@@ -20,8 +20,10 @@ msgid "— State: {0}"
 msgstr "— State: {0}"
 
 #. placeholder {0}: Chapters.getUniqueCount(visibleChapters)
-#. placeholder {0}: selectedChapters.length
+#. placeholder {0}: Object.keys(savedChapters).length
+#. placeholder {0}: chapterIds.length
 #: src/features/chapter/components/ChapterList.tsx
+#: src/features/offline/screens/OfflineStorageSettings.tsx
 msgid "{0, plural, one {# chapter} other {# chapters}}"
 msgstr "{0, plural, one {# chapter} other {# chapters}}"
 
@@ -111,10 +113,20 @@ msgstr "{0, plural, one {1 migrating entry} other {# migrating entries}}"
 msgid "{0, plural, one {1 searching} other {# searching}}"
 msgstr "{0, plural, one {1 searching} other {# searching}}"
 
+#. placeholder {0}: toRemove.length
+#: src/features/offline/OfflineChapters.ts
+msgid "{0, plural, one {Chapter removed from this device} other {# chapters removed from this device}}"
+msgstr "{0, plural, one {Chapter removed from this device} other {# chapters removed from this device}}"
+
 #. placeholder {0}: reorders.length
 #: src/features/downloads/screens/DownloadQueue.tsx
 msgid "{0, plural, one {Could not reorder download} other {Could not reorder downloads}}"
 msgstr "{0, plural, one {Could not reorder download} other {Could not reorder downloads}}"
+
+#. placeholder {0}: toSave.length
+#: src/features/offline/OfflineChapters.ts
+msgid "{0, plural, one {Saving the chapter on this device...} other {Saving # chapters on this device...}}"
+msgstr "{0, plural, one {Saving the chapter on this device...} other {Saving # chapters on this device...}}"
 
 #. placeholder {0}: autoScroll.value
 #: src/features/reader/auto-scroll/settings/quick-setting/ReaderNavBarDesktopAutoScroll.tsx
@@ -138,6 +150,12 @@ msgstr "{0} / {1}{2}"
 #: src/features/library/screens/LibraryShare.tsx
 msgid "{0} has to confirm the change before it applies."
 msgstr "{0} has to confirm the change before it applies."
+
+#. placeholder {0}: formatBytes(usage.used)
+#. placeholder {1}: formatBytes(usage.quota)
+#: src/features/offline/screens/OfflineStorageSettings.tsx
+msgid "{0} of {1} used by the app"
+msgstr "{0} of {1} used by the app"
 
 #. placeholder {0}: otherOf(share)
 #. placeholder {1}: describeSettings(!!share.proposedSynced, !!share.proposedMirror)
@@ -370,6 +388,18 @@ msgstr "{otherResultsCount, plural, one {# more match} other {# more matches}}"
 msgid "{progress}% | Updating…"
 msgstr "{progress}% | Updating…"
 
+#: src/features/offline/screens/OfflineStorageSettings.tsx
+msgid "{queuedProgressCount, plural, one {Reading progress of # chapter} other {Reading progress of # chapters}}"
+msgstr "{queuedProgressCount, plural, one {Reading progress of # chapter} other {Reading progress of # chapters}}"
+
+#: src/features/offline/OfflineChapters.ts
+msgid "{savedCount, plural, one {Chapter saved on this device} other {# chapters saved on this device}}"
+msgstr "{savedCount, plural, one {Chapter saved on this device} other {# chapters saved on this device}}"
+
+#: src/features/offline/OfflineProgressSync.ts
+msgid "{syncedCount, plural, one {Reading progress of one chapter was sent to the server} other {Reading progress of # chapters was sent to the server}}"
+msgstr "{syncedCount, plural, one {Reading progress of one chapter was sent to the server} other {Reading progress of # chapters was sent to the server}}"
+
 #: src/features/backup/Backup.utils.ts
 msgid "{ttl, plural, one {Delete backups that are older than # day} other {Delete backups that are older than # days}}"
 msgstr "{ttl, plural, one {Delete backups that are older than # day} other {Delete backups that are older than # days}}"
@@ -561,6 +591,14 @@ msgstr "Also remove from {0}"
 #: src/features/library/components/LibraryOptionsPanel.tsx
 msgid "and"
 msgstr "and"
+
+#: src/features/offline/screens/OfflineStorageSettings.tsx
+msgid "App saved: no"
+msgstr "App saved: no"
+
+#: src/features/offline/screens/OfflineStorageSettings.tsx
+msgid "App saved: yes"
+msgstr "App saved: yes"
 
 #: src/features/settings/screens/Appearance.tsx
 #: src/features/settings/screens/Settings.tsx
@@ -1026,6 +1064,10 @@ msgstr "Chapter transition warning"
 msgid "Chapters"
 msgstr "Chapters"
 
+#: src/features/offline/screens/OfflineStorageSettings.tsx
+msgid "Chapters you save from the options of a chapter can be read without the server."
+msgstr "Chapters you save from the options of a chapter can be read without the server."
+
 #: src/features/library/screens/LibraryDuplicates.tsx
 msgid "Check description"
 msgstr "Check description"
@@ -1355,6 +1397,10 @@ msgstr "Could not open random entry"
 msgid "Could not remove all downloads from the queue"
 msgstr "Could not remove all downloads from the queue"
 
+#: src/features/offline/screens/OfflineStorageSettings.tsx
+msgid "Could not remove everything from this device"
+msgstr "Could not remove everything from this device"
+
 #: src/features/extension/store/screens/ExtensionStores.tsx
 msgid "Could not remove extension store \"{name}\""
 msgstr "Could not remove extension store \"{name}\""
@@ -1362,6 +1408,10 @@ msgstr "Could not remove extension store \"{name}\""
 #: src/features/library/screens/LibrarySettings.tsx
 msgid "Could not remove non library manga from categories"
 msgstr "Could not remove non library manga from categories"
+
+#: src/features/offline/OfflineChapters.ts
+msgid "Could not remove the chapters from this device"
+msgstr "Could not remove the chapters from this device"
 
 #: src/features/library/screens/LibraryShare.tsx
 msgid "Could not remove the share"
@@ -1398,6 +1448,10 @@ msgstr "Could not save notes"
 #: src/features/library/screens/LibraryShare.tsx
 msgid "Could not save the change"
 msgstr "Could not save the change"
+
+#: src/features/offline/OfflineChapters.ts
+msgid "Could not save the chapter on this device"
+msgstr "Could not save the chapter on this device"
 
 #: src/features/category/components/CategorySelect.tsx
 #: src/features/library/components/LibraryOptionsPanel.tsx
@@ -2765,6 +2819,7 @@ msgstr "Manage your existing devices.\n"
 "This makes it possible to have e.g. different settings on a desktop and a smartphone"
 
 #: src/features/manga/screens/Manga.tsx
+#: src/features/offline/screens/OfflineStorageSettings.tsx
 #: src/features/reader/settings/behaviour/components/ReaderSettingExitMode.tsx
 #: src/features/tracker/Tracker.constants.ts
 msgid "Manga"
@@ -3157,6 +3212,15 @@ msgstr "Obsolete"
 msgid "OEL"
 msgstr "OEL"
 
+#: src/features/offline/screens/OfflineStorageSettings.tsx
+#: src/features/settings/screens/Settings.tsx
+msgid "Offline storage"
+msgstr "Offline storage"
+
+#: src/features/offline/components/OfflineBanner.tsx
+msgid "Offline: showing what is saved on this device"
+msgstr "Offline: showing what is saved on this device"
+
 #: src/features/reader/overlay/navigation/desktop/quick-settings/components/ReaderNavBarDesktopOffsetDoubleSpread.tsx
 #: src/features/reader/settings/behaviour/ReaderBehaviourSettings.tsx
 msgid "Offset double spreads"
@@ -3264,6 +3328,10 @@ msgstr "Open the WebUI when starting the server"
 #: src/features/extension/store/screens/ExtensionStores.tsx
 msgid "Open website"
 msgstr "Open website"
+
+#: src/features/offline/screens/OfflineStorageSettings.tsx
+msgid "Opens without the server"
+msgstr "Opens without the server"
 
 #: src/features/chapter/components/cards/ChapterCard.tsx
 #: src/features/manga/components/MangaOptionButton.tsx
@@ -3507,6 +3575,7 @@ msgstr "Remind later"
 #: src/base/components/settings/DateSetting.tsx
 #: src/features/library/screens/LibraryShare.tsx
 #: src/features/manga/hooks/useManageMangaLibraryState.tsx
+#: src/features/offline/screens/OfflineStorageSettings.tsx
 #: src/features/tracker/components/cards/TrackerActiveCard.tsx
 msgid "Remove"
 msgstr "Remove"
@@ -3524,6 +3593,14 @@ msgstr "Remove bookmark"
 msgid "Remove bookmarks from selected"
 msgstr "Remove bookmarks from selected"
 
+#: src/features/offline/screens/OfflineStorageSettings.tsx
+msgid "Remove everything from this device"
+msgstr "Remove everything from this device"
+
+#: src/features/offline/screens/OfflineStorageSettings.tsx
+msgid "Remove everything from this device?"
+msgstr "Remove everything from this device?"
+
 #: src/features/manga/components/MangaBadges.tsx
 #: src/features/manga/Manga.constants.ts
 #: src/features/reader/overlay/navigation/components/ReaderLibraryButton.tsx
@@ -3531,6 +3608,8 @@ msgid "Remove from the library"
 msgstr "Remove from the library"
 
 #: src/features/authentication/components/UserAccountsDialog.tsx
+#: src/features/chapter/components/actions/ChapterActionMenuItems.tsx
+#: src/features/offline/screens/OfflineStorageSettings.tsx
 msgid "Remove from this device"
 msgstr "Remove from this device"
 
@@ -3546,9 +3625,17 @@ msgstr "Remove non library manga from categories"
 msgid "Remove selected from the library"
 msgstr "Remove selected from the library"
 
+#: src/features/chapter/components/actions/ChapterActionMenuItems.tsx
+msgid "Remove selected from this device"
+msgstr "Remove selected from this device"
+
 #: src/features/library/screens/LibraryShare.tsx
 msgid "Remove this share?"
 msgstr "Remove this share?"
+
+#: src/features/offline/screens/OfflineStorageSettings.tsx
+msgid "Removed everything from this device"
+msgstr "Removed everything from this device"
 
 #: src/features/library/screens/LibrarySettings.tsx
 msgid "Removed non library manga from categories"
@@ -3655,9 +3742,27 @@ msgstr "Save current search"
 msgid "Save dynamic color theme"
 msgstr "Save dynamic color theme"
 
+#: src/features/chapter/components/actions/ChapterActionMenuItems.tsx
+msgid "Save on this device"
+msgstr "Save on this device"
+
 #: src/features/source/browse/components/SourceOptions.tsx
 msgid "Save search"
 msgstr "Save search"
+
+#: src/features/chapter/components/actions/ChapterActionMenuItems.tsx
+msgid "Save selected on this device"
+msgstr "Save selected on this device"
+
+#. placeholder {0}: toSave.length
+#: src/features/offline/OfflineChapters.ts
+msgid "Saved {savedCount} of {0} chapters, the rest could not be saved"
+msgstr "Saved {savedCount} of {0} chapters, the rest could not be saved"
+
+#: src/features/chapter/components/cards/ChapterCard.tsx
+#: src/features/offline/screens/OfflineStorageSettings.tsx
+msgid "Saved on this device"
+msgstr "Saved on this device"
 
 #: src/features/theme/components/CreateThemeDialog.tsx
 msgid "Saved theme changes"
@@ -3774,6 +3879,14 @@ msgstr "Second"
 msgid "Second to last read chapter"
 msgstr "Second to last read chapter"
 
+#: src/features/offline/screens/OfflineStorageSettings.tsx
+msgid "Secure connection (https): no. Browsers only allow saving the app and chapters on the device over https (or on localhost), so open the server through an https address."
+msgstr "Secure connection (https): no. Browsers only allow saving the app and chapters on the device over https (or on localhost), so open the server through an https address."
+
+#: src/features/offline/screens/OfflineStorageSettings.tsx
+msgid "Secure connection (https): yes"
+msgstr "Secure connection (https): yes"
+
 #: src/features/settings/screens/ServerSettings.tsx
 msgid "See <0>FlareSolverr</0> for information on how to set it up"
 msgstr "See <0>FlareSolverr</0> for information on how to set it up"
@@ -3878,6 +3991,14 @@ msgstr "Server version"
 #: src/features/app-updates/components/ServerUpdateChecker.tsx
 msgid "Server was updated to version {version} ({0})"
 msgstr "Server was updated to version {version} ({0})"
+
+#: src/features/offline/screens/OfflineStorageSettings.tsx
+msgid "Service worker: active"
+msgstr "Service worker: active"
+
+#: src/features/offline/screens/OfflineStorageSettings.tsx
+msgid "Service worker: not active yet, open the app once more while online"
+msgstr "Service worker: not active yet, open the app once more while online"
 
 #: src/features/theme/components/CreateThemeDialog.tsx
 msgid "Set as active theme"
@@ -4400,6 +4521,10 @@ msgstr "The previous chapter has a different scanlator than the current one.\n"
 "Previous: {nextScanlator}\n"
 "Current: {currentScanlator}"
 
+#: src/features/offline/screens/OfflineStorageSettings.tsx
+msgid "The saved chapters and the data kept for offline use are deleted from this device. Nothing changes on the server."
+msgstr "The saved chapters and the data kept for offline use are deleted from this device. Nothing changes on the server."
+
 #: src/features/theme/components/CreateThemeDialog.tsx
 msgid "The theme name must be unique and has a limit of 16 characters"
 msgstr "The theme name must be unique and has a limit of 16 characters"
@@ -4437,6 +4562,11 @@ msgstr "These options are slow and dangerous and may lead to restrictions from s
 #: src/features/downloads/components/DeleteChaptersWhileReadingSetting.tsx
 msgid "Third to last read chapter"
 msgstr "Third to last read chapter"
+
+#: src/features/offline/OfflineChapters.ts
+#: src/features/offline/screens/OfflineStorageSettings.tsx
+msgid "This browser cannot save chapters on the device"
+msgstr "This browser cannot save chapters on the device"
 
 #: src/features/browse/screens/BrowseSettings.tsx
 msgid "This does not prevent unofficial or potentially incorrectly flagged extensions from surfacing NSFW (18+) content within the app."
@@ -4816,6 +4946,10 @@ msgstr "Waiting for approval"
 #: src/features/library/screens/LibraryShare.tsx
 msgid "Waiting for your approval"
 msgstr "Waiting for your approval"
+
+#: src/features/offline/screens/OfflineStorageSettings.tsx
+msgid "Waiting to be sent to the server"
+msgstr "Waiting to be sent to the server"
 
 #: src/base/components/feedback/SnackbarWithDescription.tsx
 msgid "Warning"

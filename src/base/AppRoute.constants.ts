@@ -124,6 +124,10 @@ export const AppRoutes = {
                 match: 'device',
                 path: '/settings/device',
             },
+            offline: {
+                match: 'offline',
+                path: '/settings/offline',
+            },
             tracking: {
                 match: 'tracking',
                 path: '/settings/tracking',

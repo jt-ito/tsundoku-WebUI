@@ -8,6 +8,7 @@
 
 import { useMemo, useSyncExternalStore } from 'react';
 import { AppStorage } from '@/lib/storage/AppStorage.ts';
+import { OfflineStorage } from '@/features/offline/OfflineStorage.ts';
 
 let notifierValue = 0;
 
@@ -153,6 +154,7 @@ export class AuthManager {
     static activateSavedAccount(account: SavedAccount): void {
         AppStorage.session.setItem(AuthManager.REFRESH_TOKEN_KEY, undefined);
         AppStorage.local.setItem(AuthManager.REFRESH_TOKEN_KEY, account.refreshToken);
+        OfflineStorage.clearAccountData().catch(() => {});
         AuthManager.accessToken = null;
         AuthManager.notify();
     }
@@ -214,6 +216,8 @@ export class AuthManager {
         }
         AppStorage.session.setItem(AuthManager.REFRESH_TOKEN_KEY, undefined);
         AppStorage.local.setItem(AuthManager.REFRESH_TOKEN_KEY, undefined);
+        // the answers of the server kept for offline use belong to the account
+        OfflineStorage.clearAccountData().catch(() => {});
         AuthManager.notify();
     }
 

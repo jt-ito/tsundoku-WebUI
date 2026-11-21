@@ -404,6 +404,9 @@ import { useLocalStorage } from '@/base/hooks/useStorage.tsx';
 import { KO_SYNC_LOGIN, KO_SYNC_LOGOUT } from '@/lib/graphql/koreader/KoreaderSyncMutation.ts';
 import { GET_KO_SYNC_STATUS } from '@/lib/graphql/koreader/KoreaderSyncQuery.ts';
 import { ImageCache } from '@/lib/service-worker/ImageCache.ts';
+import type { ReadingProgress } from '@/features/offline/OfflineStorage.ts';
+import { OfflineStorage } from '@/features/offline/OfflineStorage.ts';
+import { OfflineMode } from '@/features/offline/OfflineMode.ts';
 import { Sources } from '@/features/source/services/Sources.ts';
 import uniqBy from 'lodash/fp/uniqBy';
 import { EXTENSION_STORE_FIELDS } from '@/lib/graphql/extension/store/ExtensionStoreFragments.ts';
@@ -1222,6 +1225,17 @@ export class RequestManager {
         url: string,
         options: ImageRequestOptions & { useFetchApi?: boolean } = {},
     ): Promise<ImageRequest> {
+        // pages saved on the device are read from there, also when the server could be reached
+        const savedImageUrl = await OfflineStorage.getPageObjectUrl(url);
+        if (savedImageUrl) {
+            return {
+                response: Promise.resolve(savedImageUrl),
+                abortRequest: () => {},
+                cleanup: () => URL.revokeObjectURL(savedImageUrl),
+                fromCache: true,
+            };
+        }
+
         const finalOptions = {
             useFetchApi: AuthManager.isAuthRequired(),
             shouldDecode: false,
@@ -2862,6 +2876,25 @@ export class RequestManager {
         } as unknown as Response;
     }
 
+    public getChapterPagesFetch(
+        chapterId: number,
+        options?: MutationOptions<GetChapterPagesFetchMutation, GetChapterPagesFetchMutationVariables>,
+    ): AbortableApolloMutationResponse<GetChapterPagesFetchMutation> {
+        return this.doRequest<GetChapterPagesFetchMutation, GetChapterPagesFetchMutationVariables>(
+            GQLMethod.MUTATION,
+            GET_CHAPTER_PAGES_FETCH,
+            { input: { chapterId } },
+            options,
+        );
+    }
+
+    /** downloads an image from the server (with the login of the user), e.g. to save a chapter page on the device */
+    public async fetchImageBlob(url: string): Promise<Blob> {
+        const response = await this.restClient.fetcher(url, { checkResponseIsJson: false });
+
+        return response.blob();
+    }
+
     public useGetChapterPagesFetch(
         chapterId: string | number,
         options?: MutationHookOptions<GetChapterPagesFetchMutation, GetChapterPagesFetchMutationVariables>,
@@ -3080,12 +3113,47 @@ export class RequestManager {
         );
     }
 
+    private async queueReadingProgress(
+        ids: number[],
+        patch: ReadingProgress,
+        trackProgressMangaId: number,
+    ): Promise<ApolloClient.MutateResult<UpdateChaptersMutation>> {
+        await OfflineStorage.queueProgress(ids, patch, trackProgressMangaId >= 0 ? trackProgressMangaId : undefined);
+
+        // what the screens (and the reader, to know what changed) read
+        const { cache } = this.graphQLClient.client;
+        ids.forEach((id) =>
+            cache.modify({
+                id: cache.identify({ __typename: 'ChapterType', id }),
+                fields: {
+                    ...(patch.isRead != null && { isRead: () => patch.isRead }),
+                    ...(patch.lastPageRead != null && { lastPageRead: () => patch.lastPageRead }),
+                    ...(patch.lastPageOffset != null && { lastPageOffset: () => patch.lastPageOffset }),
+                },
+            }),
+        );
+
+        return { data: undefined } as ApolloClient.MutateResult<UpdateChaptersMutation>;
+    }
+
     public updateChapters(
         ids: number[],
         patch: UpdateChapterPatchInput & { chapterIdsToDelete?: number[]; trackProgressMangaId?: MangaIdInfo['id'] },
         options?: MutationOptions<UpdateChaptersMutation, UpdateChaptersMutationVariables>,
     ): AbortableApolloMutationResponse<UpdateChaptersMutation> {
         const { chapterIdsToDelete = [], trackProgressMangaId = -1, ...updatePatch } = patch;
+
+        // Reading progress made without the server is kept on the device and sent when it can be reached again
+        // (see "OfflineProgressSync"). Until then the screens show it.
+        const isReadingProgress =
+            Object.keys(updatePatch).length > 0 &&
+            Object.keys(updatePatch).every((key) => ['isRead', 'lastPageRead', 'lastPageOffset'].includes(key));
+        if (OfflineMode.isOffline() && isReadingProgress) {
+            return {
+                response: this.queueReadingProgress(ids, updatePatch, trackProgressMangaId),
+                abortRequest: () => {},
+            };
+        }
 
         return this.doRequest<UpdateChaptersMutation, UpdateChaptersMutationVariables>(
             GQLMethod.MUTATION,

@@ -13,6 +13,7 @@ import { SplashScreen } from '@/features/authentication/components/SplashScreen.
 import { requestManager } from '@/lib/requests/RequestManager.ts';
 import { AuthManager } from '@/features/authentication/AuthManager.ts';
 import { defaultPromiseErrorHandler } from '@/lib/DefaultPromiseErrorHandler.ts';
+import { OfflineMode, useIsOffline } from '@/features/offline/OfflineMode.ts';
 
 const REFRESH_BEFORE_EXPIRY_MS = 30_000;
 const MIN_REFRESH_DELAY_MS = 5_000;
@@ -118,6 +119,11 @@ export const AuthGuard = ({ children }: { children: ReactNode }) => {
         isInitializingRef.current = true;
 
         const initialize = async () => {
+            if (OfflineMode.isOffline()) {
+                // the data is the saved one, so the login has to be set up again once the server is back
+                OfflineMode.markStartedOffline();
+            }
+
             AuthManager.setAuthRequired(false);
 
             // the server does not require a login, so a stored refresh token belongs to a personal account
@@ -133,6 +139,20 @@ export const AuthGuard = ({ children }: { children: ReactNode }) => {
 
         initialize().catch(defaultPromiseErrorHandler('AuthGuard::initialize'));
     }, [data]);
+
+    // The server cannot be reached and told nothing about the login: open the app with what is saved on the device
+    // instead of waiting for the server for ever. Nothing is sent to it, the stored answers are shown.
+    const isOffline = useIsOffline();
+    useEffect(() => {
+        if (!isOffline || AuthManager.isAuthInitialized() || AuthManager.isAuthRequired() !== null) {
+            return;
+        }
+
+        OfflineMode.markStartedOffline();
+        AuthManager.setAuthRequired(false);
+        AuthManager.setAuthInitialized(true);
+        requestManager.processQueues();
+    }, [isOffline, isAuthRequired]);
 
     if (isAuthRequired === null) {
         return <SplashScreen />;

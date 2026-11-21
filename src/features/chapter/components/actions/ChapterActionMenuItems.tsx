@@ -46,6 +46,10 @@ import type {
 import { IconWebView } from '@/assets/icons/IconWebView.tsx';
 import { IconBrowser } from '@/assets/icons/IconBrowser.tsx';
 import CancelIcon from '@mui/icons-material/Cancel';
+import OfflinePinOutlined from '@mui/icons-material/OfflinePinOutlined';
+import CloudOff from '@mui/icons-material/CloudOff';
+import { useSavedChapters } from '@/features/offline/OfflineStorage.ts';
+import { OfflineChapters } from '@/features/offline/OfflineChapters.ts';
 
 type BaseProps = { onClose: () => void; selectable?: boolean };
 
@@ -121,6 +125,13 @@ export const ChapterActionMenuItems = ({
         }),
         [selectedChapters],
     );
+
+    const savedChapters = useSavedChapters();
+    const isChapterSaved = !!chapter && !!savedChapters[chapter.id];
+    const chaptersToSave = (isSingleMode ? [chapter] : selectedChapters).filter(({ id }) => !savedChapters[id]);
+    const savedChapterIds = (isSingleMode ? [chapter] : selectedChapters)
+        .filter(({ id }) => !!savedChapters[id])
+        .map(({ id }) => id);
 
     const handleSelect = () => {
         handleSelection?.(chapter.id, true);
@@ -227,6 +238,32 @@ export const ChapterActionMenuItems = ({
                         performAction('delete', Chapters.getDeletable(downloadedChapters, deleteChaptersWithBookmark))
                     }
                     title={getMenuItemTitle('delete', downloadedChapters.length)}
+                />
+            )}
+            {shouldShowMenuItem(!isChapterSaved) && (
+                <MenuItem
+                    Icon={OfflinePinOutlined}
+                    disabled={isMenuItemDisabled(!chaptersToSave.length)}
+                    onClick={() => {
+                        OfflineChapters.save(chaptersToSave).catch(
+                            defaultPromiseErrorHandler('ChapterActionMenuItems::saveToDevice'),
+                        );
+                        onClose();
+                    }}
+                    title={isSingleMode ? t`Save on this device` : t`Save selected on this device`}
+                />
+            )}
+            {shouldShowMenuItem(isChapterSaved) && (
+                <MenuItem
+                    Icon={CloudOff}
+                    disabled={isMenuItemDisabled(!savedChapterIds.length)}
+                    onClick={() => {
+                        OfflineChapters.remove(savedChapterIds).catch(
+                            defaultPromiseErrorHandler('ChapterActionMenuItems::removeFromDevice'),
+                        );
+                        onClose();
+                    }}
+                    title={isSingleMode ? t`Remove from this device` : t`Remove selected from this device`}
                 />
             )}
             {shouldShowMenuItem(!isBookmarked) && (

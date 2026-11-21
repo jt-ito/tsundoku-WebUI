@@ -21,6 +21,7 @@ import SyncIcon from '@mui/icons-material/Sync';
 import PaletteIcon from '@mui/icons-material/Palette';
 import HistoryIcon from '@mui/icons-material/History';
 import ImageIcon from '@mui/icons-material/Image';
+import OfflinePinIcon from '@mui/icons-material/OfflinePin';
 import { useLingui } from '@lingui/react/macro';
 import { CARD_LIST_SX } from '@/base/components/lists/cardListSx.ts';
 import { ListItemLink } from '@/base/components/lists/ListItemLink.tsx';
@@ -93,6 +94,12 @@ export function Settings() {
                     <DevicesIcon />
                 </ListItemIcon>
                 <ListItemText primary={t`Device`} />
+            </ListItemLink>
+            <ListItemLink to={AppRoutes.settings.children.offline.path}>
+                <ListItemIcon>
+                    <OfflinePinIcon />
+                </ListItemIcon>
+                <ListItemText primary={t`Offline storage`} />
             </ListItemLink>
             <ListItemLink to={AppRoutes.settings.children.webui.path}>
                 <ListItemIcon>

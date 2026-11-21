@@ -40,6 +40,8 @@ import { useReloadOnNewVersion } from '@/lib/utils/ReloadOnNewVersion.ts';
 import { usePinchZoomOnlyInReader } from '@/lib/utils/PinchZoom.ts';
 import { useBlurInputOnScroll } from '@/lib/utils/BlurInputOnScroll.ts';
 import { SplashScreen } from '@/features/authentication/components/SplashScreen.tsx';
+import { OfflineBanner } from '@/features/offline/components/OfflineBanner.tsx';
+import { OfflineProgressSync } from '@/features/offline/OfflineProgressSync.ts';
 import { d } from 'koration';
 import { OffsetContainer } from '@/base/OffsetComponent.tsx';
 
@@ -85,6 +87,10 @@ const { BrowseSettings } = loadable(() => import('@/features/browse/screens/Brow
 const { WebUISettings } = loadable(() => import('@/features/settings/screens/WebUISettings.tsx'), lazyLoadFallback);
 const { Migration } = loadable(() => import('@/features/migration/screens/Migration.tsx'), lazyLoadFallback);
 const { DeviceSetting } = loadable(() => import('@/features/device/screens/DeviceSetting.tsx'), lazyLoadFallback);
+const { OfflineStorageSettings } = loadable(
+    () => import('@/features/offline/screens/OfflineStorageSettings.tsx'),
+    lazyLoadFallback,
+);
 const { TrackingSettings } = loadable(
     () => import('@/features/tracker/screens/TrackingSettings.tsx'),
     lazyLoadFallback,
@@ -186,6 +192,9 @@ const InitialBackgroundRequests = () => {
         // Fetch extension list on startup to show up-to-date number of available extension updates in the navigation bar
         // without having to open the extensions page.
         fetchExtensionList().catch(defaultPromiseErrorHandler('App::InitialBackgroundRequests: extension list'));
+
+        // send the reading progress that was made without the server, now and whenever it can be reached again
+        OfflineProgressSync.start();
     }, []);
 
     return null;
@@ -365,6 +374,10 @@ const MainApp = () => {
                             </Route>
                             <Route path={AppRoutes.settings.children.history.match} element={<HistorySettings />} />
                             <Route path={AppRoutes.settings.children.device.match} element={<DeviceSetting />} />
+                            <Route
+                                path={AppRoutes.settings.children.offline.match}
+                                element={<OfflineStorageSettings />}
+                            />
                             <Route path={AppRoutes.settings.children.tracking.match} element={<TrackingSettings />} />
                             <Route path={AppRoutes.settings.children.appearance.match} element={<Appearance />} />
                         </Route>
@@ -466,6 +479,7 @@ export const App: React.FC = () => (
                     </OffsetContainerRoot>
                 </Box>
                 <MigrationFABIndicator />
+                <OfflineBanner />
                 <WebViewModal />
             </InitializeGuard>
         </AuthGuard>

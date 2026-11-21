@@ -24,6 +24,8 @@ import type { GraphQLFormattedError } from 'graphql';
 import { BaseClient } from '@/lib/requests/client/BaseClient.ts';
 import type { TypedTypePolicies } from '@/lib/graphql/generated/apollo-helpers.ts';
 import { AuthManager } from '@/features/authentication/AuthManager.ts';
+import { createOfflineResponseLink } from '@/lib/requests/client/OfflineResponseLink.ts';
+import { OfflineMode } from '@/features/offline/OfflineMode.ts';
 import type { UserRefreshMutation } from '@/lib/graphql/generated/graphql.ts';
 import type { AbortableApolloMutationResponse } from '@/lib/requests/RequestManager.ts';
 import type { ChapterNodeList } from '@/lib/graphql/generated/graphql-base.types.ts';
@@ -229,6 +231,24 @@ export class GraphQLClient extends BaseClient<ApolloClient, ApolloClient.Options
         super(handleRefreshToken);
 
         this.createClient();
+
+        OfflineMode.setHandlers(
+            // any answer of the server (even a refusal) means that it can be reached
+            () =>
+                fetch(this.getBaseUrl(), {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ query: '{__typename}' }),
+                    credentials: 'include',
+                    // a server that does not answer in time is as good as not there
+                    signal: AbortSignal.timeout(10_000),
+                }).then(() => true),
+            () => {
+                // what was shown came from the device: ask the server again and reconnect the subscriptions
+                this.client.refetchQueries({ include: 'active' }).catch(() => {});
+                this.restartAllSubscriptions();
+            },
+        );
     }
 
     public override getBaseUrl(): string {
@@ -380,6 +400,7 @@ export class GraphQLClient extends BaseClient<ApolloClient, ApolloClient.Options
             },
             this.createWSLink(),
             ApolloLink.from([
+                createOfflineResponseLink(),
                 this.createAuthGuardLink(),
                 this.createErrorLink(),
                 this.createAuthLink(),
