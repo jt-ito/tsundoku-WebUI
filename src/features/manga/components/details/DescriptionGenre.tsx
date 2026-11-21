@@ -28,6 +28,15 @@ import { MangaNotes } from '@/features/manga/components/details/MangaNotes.tsx';
 import { useGetMangaMetadata } from '@/features/manga/services/MangaMetadata.ts';
 import uniq from 'lodash/fp/uniq';
 import { MarkdownViewer } from '@/lib/mui-tiptap/MarkdownViewer.tsx';
+import { useNavigate } from 'react-router-dom';
+import { requestManager } from '@/lib/requests/RequestManager.ts';
+import { AppRoutes } from '@/base/AppRoute.constants.ts';
+import { GET_SOURCE_BROWSE } from '@/lib/graphql/source/SourceQuery.ts';
+import type { GetSourceBrowseQuery, GetSourceBrowseQueryVariables } from '@/lib/graphql/generated/graphql.ts';
+import type { IPos } from '@/features/source/Source.types.ts';
+import { SourceContentType } from '@/features/source/Source.types.ts';
+import { findFilterForTag } from '@/features/source/services/SourceFilterSearch.ts';
+import { useReloadIncompleteSourceFilters } from '@/features/source/hooks/useReloadIncompleteSourceFilters.ts';
 
 const OPEN_CLOSE_BUTTON_HEIGHT = '35px';
 const DESCRIPTION_COLLAPSED_SIZE = 100;
@@ -56,6 +65,43 @@ export const DescriptionGenre = ({
         ? Math.min(DESCRIPTION_COLLAPSED_SIZE, descriptionHeight ?? DESCRIPTION_COLLAPSED_SIZE)
         : 0;
     const genres = useMemo(() => uniq(mangaGenres.filter(Boolean)), [mangaGenres]);
+
+    const navigate = useNavigate();
+
+    // A genre is searched in the source the manga is from, wherever the page was opened from (the library, the updates,
+    // the history or the source itself), like Mihon does. The other places (the global search, the migration) keep their
+    // own search.
+    const canSearchSource = sourceId !== undefined && (mode === 'source' || mode === 'default' || mode === undefined);
+    const {
+        data: sourceData,
+        error: sourceError,
+        refetch: refetchSource,
+    } = requestManager.useGetSource<GetSourceBrowseQuery, GetSourceBrowseQueryVariables>(GET_SOURCE_BROWSE, sourceId, {
+        skip: !canSearchSource,
+    });
+    // a source that cannot be opened (e.g. its extension was uninstalled) leaves the search of the library
+    const isSourceMode = canSearchSource && !sourceError;
+
+    // A genre that is a filter of the source is searched with that filter, like the source's own filter screen does.
+    // Searching its name as text only finds the titles that have the word in them.
+    const sourceFilters = sourceData?.source.filters;
+    // some extensions have only a part of their filters at first, the genres come a moment later
+    useReloadIncompleteSourceFilters(isSourceMode ? sourceFilters : undefined, refetchSource);
+    const filterByGenre = useMemo(() => {
+        const filters = new Map<string, IPos>();
+        if (!sourceFilters) {
+            return filters;
+        }
+
+        genres.forEach((genre) => {
+            const filter = findFilterForTag(sourceFilters, genre);
+            if (filter) {
+                filters.set(genre, filter);
+            }
+        });
+
+        return filters;
+    }, [genres, sourceFilters]);
 
     return (
         <>
@@ -103,11 +149,37 @@ export const DescriptionGenre = ({
                     overflowX: isCollapsed ? 'auto' : null,
                 }}
             >
-                {genres.map((genre) => (
-                    <SearchLink key={genre} query={genre} sourceId={sourceId} mode={mode}>
-                        <Chip label={genre} variant="outlined" onClick={() => {}} />
-                    </SearchLink>
-                ))}
+                {genres.map((genre) => {
+                    const filter = filterByGenre.get(genre);
+                    if (!filter) {
+                        return (
+                            <SearchLink
+                                key={genre}
+                                query={genre}
+                                sourceId={sourceId}
+                                mode={isSourceMode ? 'source' : mode}
+                            >
+                                <Chip label={genre} variant="outlined" onClick={() => {}} />
+                            </SearchLink>
+                        );
+                    }
+
+                    return (
+                        <Chip
+                            key={genre}
+                            label={genre}
+                            variant="outlined"
+                            onClick={() =>
+                                navigate(AppRoutes.sources.children.browse.path(sourceId), {
+                                    state: AppRoutes.sources.children.browse.state({
+                                        contentType: SourceContentType.SEARCH,
+                                        filters: [filter],
+                                    }),
+                                })
+                            }
+                        />
+                    );
+                })}
             </Stack>
         </>
     );

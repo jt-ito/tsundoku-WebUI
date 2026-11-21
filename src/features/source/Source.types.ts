@@ -83,6 +83,8 @@ export enum SourceContentType {
 
 export interface RouteStateSourceBrowse {
     contentType?: SourceContentType;
+    /** the filters to start with, e.g. the genre of a manga that was clicked */
+    filters?: IPos[];
     clearCache?: boolean;
     mode?: MangaCardMode;
     mangaId?: MangaIdInfo['id'];

@@ -43,6 +43,7 @@ import { MANGA_GRID_SNAPSHOT_KEY } from '@/features/manga/components/MangaGrid.t
 import { createUpdateSourceMetadata, useGetSourceMetadata } from '@/features/source/services/SourceMetadata.ts';
 import { makeToast } from '@/base/utils/Toast.ts';
 import { GET_SOURCE_BROWSE } from '@/lib/graphql/source/SourceQuery.ts';
+import { useReloadIncompleteSourceFilters } from '@/features/source/hooks/useReloadIncompleteSourceFilters.ts';
 import type { IPos, RouteStateSourceBrowse, SourceIdInfo } from '@/features/source/Source.types.ts';
 import { SourceContentType } from '@/features/source/Source.types.ts';
 import { defaultPromiseErrorHandler } from '@/lib/DefaultPromiseErrorHandler.ts';
@@ -229,6 +230,7 @@ export function SourceMangas() {
     const { key: locationKey, state: locationState } = location;
     const {
         contentType: initialContentType = SourceContentType.POPULAR,
+        filters: initialFilters,
         clearCache = false,
         mode = 'source',
         mangaId,
@@ -246,7 +248,7 @@ export function SourceMangas() {
     );
     const [filtersToApply, setLocationFiltersToApply] = useSessionStorage<IPos[]>(
         `source-mangas-location-${locationKey}-${sourceId}-filters`,
-        currentFiltersToApply ?? STABLE_EMPTY_ARRAY,
+        initialFilters ?? currentFiltersToApply ?? STABLE_EMPTY_ARRAY,
     );
     const [dialogFiltersToApply, setDialogFiltersToApply] = useState<IPos[]>(filtersToApply);
     const [currentContentType, setCurrentContentType] = useSessionStorage<SourceContentType | undefined>(
@@ -304,13 +306,15 @@ export function SourceMangas() {
     const mangas = data?.fetchSourceManga?.mangas ?? STABLE_EMPTY_ARRAY;
     const hasNextPage = !!data?.fetchSourceManga?.hasNextPage;
     const isLoading = loading || (filteredOutAllItemsOfFetchedPage && hasNextPage);
-    const { data: sourceData } = requestManager.useGetSource<GetSourceBrowseQuery, GetSourceBrowseQueryVariables>(
-        GET_SOURCE_BROWSE,
-        sourceId,
-    );
+    const { data: sourceData, refetch: refetchSource } = requestManager.useGetSource<
+        GetSourceBrowseQuery,
+        GetSourceBrowseQueryVariables
+    >(GET_SOURCE_BROWSE, sourceId);
     const source = sourceData?.source;
 
     const filters = source?.filters ?? STABLE_EMPTY_ARRAY;
+    // some extensions have only a part of their filters at first, the rest is there a moment later
+    const areFiltersIncomplete = useReloadIncompleteSourceFilters(filters, refetchSource);
     const { savedSearches = {} } = useGetSourceMetadata(source ?? DEFAULT_SOURCE);
     const updateSourceMetadata = createUpdateSourceMetadata<'savedSearches'>(source ?? { id: '-1' }, (e) =>
         makeToast(t`Failed to save changes`, 'error', getErrorMessage(e)),
@@ -406,6 +410,16 @@ export function SourceMangas() {
         setDialogFiltersToApply([]);
         setFiltersToApply([]);
     };
+
+    // The filters that were chosen while the list was incomplete refer to positions of the short list, which are other
+    // filters in the full one: start without them.
+    const wereFiltersIncompleteRef = useRef(false);
+    useEffect(() => {
+        if (wereFiltersIncompleteRef.current && !areFiltersIncomplete && filtersToApply.length) {
+            resetFilters();
+        }
+        wereFiltersIncompleteRef.current = areFiltersIncomplete;
+    }, [areFiltersIncomplete]);
 
     useEffect(() => {
         updateMetadataServerSettings('lastUsedSourceId', sourceId).catch(
